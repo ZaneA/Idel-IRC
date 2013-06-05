@@ -1,0 +1,6 @@
+<ul>
+  <li data-ng-repeat="network in networks | orderBy:'name'">
+    <span data-ng-bind="network.name"></span>
+    <channel-list for="network.channels"></channel-list>
+  </li>
+</ul>

@@ -1,0 +1,28 @@
+app.filter('escape', function () {
+  return function (text) {
+    if (!text) return '';
+
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  };
+});
+
+app.filter('linkify', function () {
+  var domainRegexp = /(https?|ftp):\/\/(.*)/;
+
+  var urlPatternReplacer = function (match, contents, offset, s) {
+    return '<a href="' + match + '">' + match.match(domainRegexp)[2] + '</a>';
+  };
+
+  return function (text) {
+    if (!text) return '';
+
+    var urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*[a-z0-9-+&@#\/%=~_|]/gim;
+    return text.replace(urlPattern, urlPatternReplacer);
+  };
+});
+
+app.filter('timestamp', function () {
+  return function (timestamp) {
+    return moment.unix(timestamp).format('h:mma');
+  };
+});

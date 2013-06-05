@@ -1,0 +1,3 @@
+<ul>
+  <li data-ng-repeat="channel in channels | orderBy:'name'" data-ng-bind="channel.name" data-ng-class="{ active: channel.activity, selected: current.network==networkName&&current.channel==channel.name }" data-ng-click="select(channel.name)"></li>
+</ul>

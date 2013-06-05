@@ -1,0 +1,7 @@
+<ul>
+  <li data-ng-repeat="line in buffer | orderBy:'timestamp'">
+    <span class="timestamp" data-ng-bind="line.timestamp | timestamp"></span>
+    <span class="nick" data-ng-bind="line.nick" data-colorize="{{line.nick}}"></span>
+    <p data-ng-bind-html-unsafe="line.message | escape | linkify"></p>
+  </li>
+</ul>
