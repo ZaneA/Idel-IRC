@@ -55,12 +55,26 @@ a {
 
 ::-webkit-scrollbar-thumb {
   background: #262626;
-  border: 1px solid #333;
+
+  background: rgba(30, 30, 30, 0);
+  border: 1px solid rgba(40, 40, 40, 0);
+
   border-radius: 7px;
 
   &:hover {
-    background: #333;
-    border: 1px solid #666;
+    background: rgba(50, 50, 50, 1) !important;
+    border: 1px solid rgba(80, 80, 80, 1) !important;
+  }
+}
+
+.scrollable() {
+  overflow: auto;
+
+  &:hover {
+    &::-webkit-scrollbar-thumb {
+      background: rgba(30, 30, 30, 1);
+      border: 1px solid rgba(40, 40, 40, 1);
+    }
   }
 }
 
@@ -176,6 +190,8 @@ header, network-list, channel-list, chat-window, nick-list, input-box {
 }
 
 chat-window {
+  .scrollable;
+
   font-size: 0.9em;
   position: relative;
   
@@ -183,9 +199,6 @@ chat-window {
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAFCAYAAABirU3bAAAAJklEQVQIW2NkAAJ9ff2ZFy9eTAexGUEEsiBcACaIIgDWgqwfJAAAYoYNLH8nbEoAAAAASUVORK5CYII=);
   background-position: 160px 0;
   background-repeat: repeat-y;
-  
-  overflow-y: scroll;
-  overflow-x: auto;
   
   li {
     padding: 0 5px;
@@ -248,7 +261,7 @@ chat-window {
 }
 
 network-list {
-  overflow: auto;
+  .scrollable;
 
   span {
     display: block;
@@ -293,7 +306,7 @@ channel-list {
 }
 
 nick-list {
-  overflow: auto;
+  .scrollable;
 
   li {
     padding: 6px 12px;
