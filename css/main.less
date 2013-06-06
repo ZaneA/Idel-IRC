@@ -25,6 +25,9 @@
 @color-channel-4: #d3d787;
 @color-channel-5: #e0c4a1;
 
+@font-sans: 'Open Sans', Helvetica, arial, sans;
+@font-mono: 'Monaco';
+
 // LESS shortcuts
 
 // HTML elements
@@ -40,7 +43,7 @@ body {
   background: @color-background;
   color: @color-text;
 
-  font-family: 'Open Sans', Helvetica, arial, sans;
+  font-family: @font-sans;
   font-size: 0.9em;
 }
 
@@ -237,6 +240,7 @@ chat-window {
     
     cursor: text;
     -webkit-user-select: all;
+    border-bottom: 1px solid #131313;
     
     .nick {
       position: absolute;
@@ -248,8 +252,8 @@ chat-window {
       font-weight: bold;
       padding: 0 8px;
       
-      &:before { content: '<'; padding: 0 4px; }
-      &:after { content: '>'; padding: 0 4px; }
+      &:before {opacity: 0.2; content: '<'; padding: 0 4px; }
+      &:after { opacity: 0.2;content: '>'; padding: 0 4px; }
     }
     
     .timestamp {
@@ -266,6 +270,9 @@ chat-window {
     }
     
     p {
+      font-family: @font-mono;
+      font-size: 0.9em;
+
       padding-left: 9px;
       margin-left: 160px;
       
@@ -359,7 +366,8 @@ input-box {
     border: none;
     border-bottom: 2px solid @color-input-edge;
 
-    font-size: 1.1em;
+    font-family: @font-mono;
+    font-size: 1.0em;
     font-weight: bold;
     
     box-shadow: inset 0 4px 4px 0 darken(@color-input, 30%);
