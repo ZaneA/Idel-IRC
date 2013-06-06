@@ -1,3 +1,30 @@
+// Colors
+
+@color-background: #111;
+@color-text: #fff;
+@color-link: #fff;
+@color-logo: #fff;
+@color-borders: #161616;
+@color-input: #0c0c0c;
+@color-topic: #fff;
+@color-input-edge: #222;
+@color-input-edge-hover: #342;
+
+@color-button-minimize: #fff;
+@color-button-close: #f55;
+
+@color-nick-1: #a1e0c4;
+@color-nick-2: #87d78b;
+@color-nick-3: #abd787;
+@color-nick-4: #d3d787;
+@color-nick-5: #e0c4a1;
+
+@color-channel-1: #a1e0c4;
+@color-channel-2: #87d78b;
+@color-channel-3: #abd787;
+@color-channel-4: #d3d787;
+@color-channel-5: #e0c4a1;
+
 // LESS shortcuts
 
 // HTML elements
@@ -10,8 +37,8 @@ html, body {
 }
 
 body {
-  background: #111;
-  color: #fff;
+  background: @color-background;
+  color: @color-text;
 
   font-family: 'Open Sans', Helvetica, arial, sans;
   font-size: 0.9em;
@@ -24,17 +51,9 @@ body {
 a {
   color: inherit;
   text-decoration: none;
-  position: relative;
-  margin: -7px;
-  padding: 5px 7px;
-  border-radius: 16px;
-
-  -webkit-transition: background ease-in-out 0.1s, color ease-in-out 0.1s;
 
   &:hover {
-    background: #fff;
-    color: #000;
-    box-shadow: 0 0 8px 8px #111;
+    text-decoration: underline;
   }
 }
 
@@ -45,13 +64,8 @@ a {
   height: 8px;
 }
 
-::-webkit-scrollbar-track-piece {
-  display: none;
-}
-
-::-webkit-scrollbar-button {
-  display: none;
-}
+::-webkit-scrollbar-track-piece { display: none; }
+::-webkit-scrollbar-button { display: none; }
 
 ::-webkit-scrollbar-thumb {
   background: #262626;
@@ -64,6 +78,18 @@ a {
   &:hover {
     background: rgba(50, 50, 50, 1) !important;
     border: 1px solid rgba(80, 80, 80, 1) !important;
+  }
+}
+
+.horizontal {
+  text-align: center;
+
+  ul {
+    display: inline-block;
+  }
+
+  li {
+    display: inline-block;
   }
 }
 
@@ -144,12 +170,13 @@ header {
   -webkit-app-region: drag;
   
   background-image: -webkit-gradient(linear, left top, left bottom,
-                                     color-stop(0%, #000),
-                                     color-stop(100%, #111));
+                                     color-stop(0%, darken(@color-background, 15%)),
+                                     color-stop(100%, @color-background));
 
   padding: 0 20px;
 
   h1 {
+    color: @color-logo;
     float: left;
     font-size: 2.0em;
     font-weight: bold;
@@ -158,7 +185,7 @@ header {
   
   p {
     text-align: right;
-    color: #cfb;
+    color: @color-topic;
     font-size: 0.8em;
     font-weight: bold;
     margin-right: 100px;
@@ -170,6 +197,10 @@ header {
 
     top: 4px;
     right: 44px;
+
+    &:hover {
+      background: @color-button-minimize;
+    }
   }
 
   .button-close {
@@ -180,13 +211,13 @@ header {
     right: 4px;
 
     &:hover {
-      background: #f55;
+      background: @color-button-close;
     }
   }
 }
 
-header, network-list, channel-list, chat-window, nick-list, input-box {
-  border: 1px solid #161616;
+header, network-list, chat-window, nick-list, input-box {
+  border: 1px solid @color-borders;
 }
 
 chat-window {
@@ -241,19 +272,11 @@ chat-window {
       a {
         font-size: 0.9em;
         font-weight: bold;
-        color: #fff;
+        color: @color-link;
         text-decoration: none;
-        position: relative;
-        margin: -7px;
-        padding: 5px 7px;
-        border-radius: 16px;
-
-        -webkit-transition: background ease-in-out 0.1s, color ease-in-out 0.1s;
         
         &:hover {
-          background: #fff;
-          color: #000;
-          box-shadow: 0 0 8px 8px #111;
+          text-decoration: underline;
         }
       }
     }
@@ -265,7 +288,7 @@ network-list {
 
   span {
     display: block;
-    border-bottom: 1px solid #161616;
+    border-bottom: 1px solid @color-borders;
     text-align: center;
     text-transform: uppercase;
 
@@ -284,11 +307,11 @@ channel-list {
 
     -webkit-transition: background ease-in-out 0.1s, color ease-in-out 0.1s;
 
-    &:nth-child(1) { color: #a1e0c4; &:hover { background: #a1e0c4; color: #000; }}
-    &:nth-child(2) { color: #87d78b; &:hover { background: #87d78b; color: #000; }}
-    &:nth-child(3) { color: #abd787; &:hover { background: #abd787; color: #000; }}
-    &:nth-child(4) { color: #d3d787; &:hover { background: #d3d787; color: #000; }}
-    &:nth-child(5) { color: #e0c4a1; &:hover { background: #e0c4a1; color: #000; }}
+    &:nth-child(1) { color: @color-channel-1; &:hover { background: @color-channel-1; color: contrast(@color-channel-1); }}
+    &:nth-child(2) { color: @color-channel-2; &:hover { background: @color-channel-2; color: contrast(@color-channel-2); }}
+    &:nth-child(3) { color: @color-channel-3; &:hover { background: @color-channel-3; color: contrast(@color-channel-3); }}
+    &:nth-child(4) { color: @color-channel-4; &:hover { background: @color-channel-4; color: contrast(@color-channel-4); }}
+    &:nth-child(5) { color: @color-channel-5; &:hover { background: @color-channel-5; color: contrast(@color-channel-5); }}
     
     cursor: pointer;
     
@@ -331,19 +354,19 @@ input-box {
     height: 100%;
     margin: 0;
     padding: 8px 20px;
-    background: #0c0c0c;
+    background: @color-input;
     color: inherit;
     border: none;
-    border-bottom: 2px solid #222;
+    border-bottom: 2px solid @color-input-edge;
 
     font-size: 1.1em;
     font-weight: bold;
     
-    box-shadow: inset 0 4px 4px 0 #000;
+    box-shadow: inset 0 4px 4px 0 darken(@color-input, 30%);
     
     &:focus {
       outline: none;
-      border-bottom: 2px solid #342;
+      border-bottom: 2px solid @color-input-edge-hover;
       &::-webkit-input-placeholder {
         color: transparent;
       }
@@ -357,8 +380,8 @@ input-box {
 
 // Nick colors
 
-.color-1 { color: #a1e0c4; &:hover { background: #a1e0c4; color: #000; }}
-.color-2 { color: #87d78b; &:hover { background: #87d78b; color: #000; }}
-.color-3 { color: #abd787; &:hover { background: #abd787; color: #000; }}
-.color-4 { color: #d3d787; &:hover { background: #d3d787; color: #000; }}
-.color-5 { color: #e0c4a1; &:hover { background: #e0c4a1; color: #000; }}
+.color-1 { color: @color-nick-1; &:hover { background: @color-nick-1; color: contrast(@color-nick-1); }}
+.color-2 { color: @color-nick-2; &:hover { background: @color-nick-2; color: contrast(@color-nick-2); }}
+.color-3 { color: @color-nick-3; &:hover { background: @color-nick-3; color: contrast(@color-nick-3); }}
+.color-4 { color: @color-nick-4; &:hover { background: @color-nick-4; color: contrast(@color-nick-4); }}
+.color-5 { color: @color-nick-5; &:hover { background: @color-nick-5; color: contrast(@color-nick-5); }}

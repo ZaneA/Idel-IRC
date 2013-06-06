@@ -19,16 +19,16 @@ app.directive('channelList', function (IRCService) {
     scope: {
       channels: '=for'
     },
-    controller: function ($scope) {
-    },
-    link: function (scope, element, attrs) {
-      scope.networkName = scope.$parent.network.name;
-      scope.current = IRCService.current;
+    controller: function ($rootScope, $scope) {
+      $scope.networkName = $scope.$parent.network.name;
+      $scope.current = IRCService.current;
 
       // Select a new channel
-      scope.select = function (name) {
-        IRCService.current.channel = name;
-        IRCService.current.network = scope.$parent.network.name;
+      $scope.select = function (name) {
+        $rootScope.$broadcast('ui::channel-list::select', {
+          channel: name,
+          network: $scope.$parent.network.name
+        });
       };
     }
   };
@@ -41,13 +41,16 @@ app.directive('chatWindow', function () {
     scope: {
       buffer: '=for'
     },
-    controller: function ($scope, $element) {
+    controller: function ($scope, $element, $timeout) {
       $scope.$on('irc::message', function (ev, message) {
         $scope.buffer.push(message);
       });
       
+      // Scroll to bottom.
       $scope.$watch('buffer', function () {
-        $element.prop('scrollTop', $element.prop('scrollHeight'));
+        $timeout(function () {
+          $element.prop('scrollTop', $element.prop('scrollHeight'));
+        },0);
       }, true);
     },
     link: function (scope, element, attrs) {
@@ -62,9 +65,11 @@ app.directive('nickList', function () {
     scope: {
       nicks: '=for'
     },
-    controller: function ($scope) {
-    },
-    link: function (scope, element, attrs) {
+    controller: function ($rootScope, $scope) {
+      // Select a nick
+      $scope.select = function (name) {
+        $rootScope.$broadcast('ui::nick-list::select', { nick: name });
+      };
     }
   };
 });
@@ -76,39 +81,44 @@ app.directive('inputBox', function () {
     scope: {
       dest: '=for'
     },
-    link: function (scope, element, attrs) {
-      scope.history = [];
+    controller: function ($rootScope, $scope, $element) {
+      $scope.history = [];
+      $scope.input = '';
+
+      $scope.$on('ui::nick-list::select', function (ev, args) {
+        $scope.input += args.nick + ', ';
+      });
 
       // Input ALWAYS has keyboard focus
-      element.children()[0].onblur = function () {
+      $element.children()[0].onblur = function () {
         this.focus();
       };
       
-      element.children()[0].onkeydown = function (ev) {
-        if (ev.keyCode == 13 && scope.input.length > 0) { // Enter
-          scope.$apply(function () {
-            scope.$root.$broadcast('ui::input-box::send', {
-              dest: scope.dest,
-              message: scope.input
+      $element.children()[0].onkeydown = function (ev) {
+        if (ev.keyCode == 13 && $scope.input.length > 0) { // Enter
+          $scope.$apply(function () {
+            $rootScope.$broadcast('ui::input-box::send', {
+              dest: $scope.dest,
+              message: $scope.input
             });
-            scope.history.unshift(scope.input);
-            scope.input = '';
+            $scope.history.unshift($scope.input);
+            $scope.input = '';
           });
         }
         
         if (ev.keyCode == 38) { // Up
-          scope.$apply(function () {
-            scope.input = scope.history.shift();
-            if (scope.input)
-              scope.history.push(scope.input);
+          $scope.$apply(function () {
+            $scope.input = $scope.history.shift();
+            if ($scope.input)
+              $scope.history.push($scope.input);
           });
         }
 
         if (ev.keyCode == 40) { // Down
-          scope.$apply(function () {
-            scope.input = scope.history.pop();
-            if (scope.input)
-              scope.history.unshift(scope.input);
+          $scope.$apply(function () {
+            $scope.input = $scope.history.pop();
+            if ($scope.input)
+              $scope.history.unshift($scope.input);
           });
         }
       };

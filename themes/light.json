@@ -1,0 +1,12 @@
+{
+  "@color-background": "#fff",
+  "@color-text": "#222",
+  "@color-link": "#222",
+  "@color-logo": "#111",
+  "@color-borders": "#eee",
+  "@color-input": "#eee",
+  "@color-topic": "#555",
+  "@color-input-edge": "#ccc",
+  "@color-input-edge-hover": "#8c8"
+}
+

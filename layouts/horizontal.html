@@ -1,0 +1,18 @@
+<vbox>
+  <header class="flex-0">
+    <h1>Idel</h1>
+    <p data-ng-bind-html-unsafe="irc.currentChannel().topic | escape | linkify"></p>
+    <button class="button-minimize" data-ng-click="minimizeClick()">_</button>
+    <button class="button-close" data-ng-click="exitClick()">&times;</button>
+  </header>
+
+  <hbox class="flex-1">
+    <network-list for="irc.networks" class="flex-0"></network-list>
+
+    <chat-window for="irc.currentChannel().buffer" class="flex-1"></chat-window>
+
+    <nick-list for="irc.currentChannel().nicks" class="flex-0"></nick-list>
+  </hbox>
+
+  <input-box for="irc.current" class="flex-0"></input-box>
+</vbox>

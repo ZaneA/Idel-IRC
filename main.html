@@ -1,31 +1,16 @@
 <!DOCTYPE html>
-<html data-ng-app="IdelApp">
+<html data-ng-app="IdelApp" data-ng-csp style="background:#111">
   <head>
     <link rel="stylesheet/less" type="text/css" href="css/main.less" />
-    <base target="_black" />
-  </head>
-  <body data-ng-controller="IdelController">
-    <vbox>
-      <header class="flex-0">
-        <h1>Idel</h1>
-        <p data-ng-bind-html-unsafe="irc.currentChannel().topic | escape | linkify"></p>
-        <button class="button-minimize" data-ng-click="minimize()">_</button>
-        <button class="button-close" data-ng-click="exit()">&times;</button>
-      </header>
-
-      <hbox class="flex-1">
-        <network-list for="irc.networks" class="flex-0"></network-list>
-
-        <chat-window for="irc.currentChannel().buffer" class="flex-1"></chat-window>
-
-        <nick-list for="irc.currentChannel().nicks" class="flex-0"></nick-list>
-      </hbox>
-
-      <input-box for="irc.current" class="flex-0"></input-box>
-    </vbox>
 
     <script src="js/less_stub.js"></script>
     <script src="components/less.js/dist/less-1.4.0-beta.js"></script>
+
+    <base target="_blank" />
+  </head>
+  <body data-ng-controller="IdelController">
+    <ng-include src="settings.layout"></ng-include>
+
     <script src="components/lodash/lodash.js"></script>
     <script src="components/moment/moment.js"></script>
     <script src="components/angular-unstable/angular.js"></script>

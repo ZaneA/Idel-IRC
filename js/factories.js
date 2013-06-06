@@ -4,19 +4,24 @@ app.factory('Network', function () {
       name: name,
       servers: servers,
       nick: nick,
-      channels: []
+      channels: [],
+      _socket: null
     };
   };
 });
 
-app.factory('Channel', function () {
+app.factory('Channel', function (Message) {
   return function (name) {
     return {
       name: name,
       activity: false,
       topic: null,
       nicks: [],
-      buffer: []
+      buffer: [],
+      addLine: function (nick, message, timestamp) {
+        this.buffer.push(Message(timestamp || moment().unix(), nick, message));
+        this.activity = true;
+      }
     };
   };
 });
