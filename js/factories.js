@@ -18,8 +18,16 @@ app.factory('Channel', function (Message) {
       topic: null,
       nicks: [],
       buffer: [],
+      addLines: function (nick, messages, timestamp) {
+        messages.forEach(function (line) {
+          this.addLine(nick, line, timestamp);
+        }.bind(this));
+      },
       addLine: function (nick, message, timestamp) {
-        this.buffer.push(Message(timestamp || moment().unix(), nick, message));
+        var lines = message.split("\n");
+        lines.forEach(function (line) {
+          this.buffer.push(Message(timestamp || moment().unix(), nick, line));
+        }.bind(this));
         this.activity = true;
       }
     };

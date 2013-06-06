@@ -9,7 +9,11 @@ app.controller('IdelController', function ($scope, $http, WindowService, Setting
     if (matches) {
       console.log(matches);
       if (matches[0] == '/help') {
-        $scope.irc.getChannel('Idel', 'Status').addLine('status', 'Help:');
+        $scope.irc.getChannel('Idel', 'Status').addLines('status', [
+          'Help:',
+          '/help',
+          '.. Show the help text'
+        ]);
       }
     } else {
       $scope.$broadcast('irc::message', Message(moment().unix(), '@zanea', input.message));
