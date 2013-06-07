@@ -5,18 +5,30 @@ app.controller('IdelController', function ($scope, $http, WindowService, Setting
   $scope.irc = IRCService;
 
   $scope.$on('ui::input-box::send', function (ev, input) {
-    var matches = input.message.match(/^\/(\w+\b)*/g);
-    if (matches) {
-      console.log(matches);
-      if (matches[0] == '/help') {
-        $scope.irc.getChannel('Idel', 'Status').addLines('status', [
-          'Help:',
-          '/help',
-          '.. Show the help text'
-        ]);
+    var network = $scope.irc.currentNetwork();
+    var channel = $scope.irc.currentChannel();
+
+    var parts = input.message.split(' ');
+    if (parts[0].indexOf('/') === 0) {
+      switch (parts[0]) {
+        case '/help':
+          $scope.irc.getChannel('Idel', 'Status').addLines('status', [
+            'Help:',
+            '/help',
+            '.. Show the help text',
+            '/quote <line>',
+            '.. Send raw text to the server'
+          ]);
+          break;
+        
+        case '/quote':
+          delete parts[0];
+          network.writeLine(parts.join(' '));
+          break;
       }
     } else {
-      $scope.$broadcast('irc::message', Message(moment().unix(), '@zanea', input.message));
+      network.writeLine('PRIVMSG ' + channel.name + ' :' + input.message);
+      $scope.$broadcast('irc::message', Message(moment().unix(), network.nick, input.message));
     }
   });
   
@@ -25,7 +37,9 @@ app.controller('IdelController', function ($scope, $http, WindowService, Setting
   });
   
   $scope.minimizeClick = WindowService.minimize;
-  $scope.exitClick = WindowService.close;
+  $scope.exitClick = function () {
+    WindowService.close();
+  };
   
   $scope.$watch('settings.theme', function (val) {
     $http.get(val).success(function (theme) {
@@ -35,5 +49,14 @@ app.controller('IdelController', function ($scope, $http, WindowService, Setting
 
   $scope.irc.getChannel('Idel', 'Status').addLine('status', 'Welcome to idel. Type /help to begin.');
   
-  //$scope.irc.connect(Network('Demonastery', ['irc.demonastery.org:6667'], 'zanea'));
+  var network = Network({
+    name: 'Demonastery',
+    servers: ['irc.demonastery.org:6667'],
+    nick: 'testclient',
+    joinChannels: ['#Bottest']
+  });
+
+  $scope.irc.networks.push(network);
+  
+  network.connect();
 });

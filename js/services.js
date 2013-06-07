@@ -1,32 +1,9 @@
-app.service('IRCService', function (Network, Channel, Message) {
+app.service('IRCService', function (Network, Channel, Message, LineSocket) {
   this.networks = [];
 
-  var idel = Network('Idel', [], 'zanea');
-  idel.channels.push(Channel('Status'));
-  idel.channels.push(Channel('test'));
-  idel.channels[0].nicks = ['@zanea', 'bot'];
+  var idel = Network({ name: 'Idel' });
   
   this.networks.push(idel);
-  
-  this.connect = function (network) {
-    chrome.socket.create('tcp', {}, function (createInfo) {
-      network._socket = createInfo.socketId;
-      var parts = network.servers[0].split(':');
-      chrome.socket.connect(network._socket, parts[0], parseInt(parts[1]), function (result) {
-        console.log(result);
-        chrome.socket.disconnect(network._socket);
-        chrome.socket.destroy(network._socket);
-      });
-    });
-  };
-  
-  //var demonastery = Network('Demonastery', ['irc.demonastery.org:6667'], 'zanea');
-  //demonastery.channels.push(Channel('#Bottest'));
-  //demonastery.channels[0].topic = 'Test channel for bot building.';
-  //demonastery.channels[0].nicks = ['@zanea', 'bot'];
-  //demonastery.channels[0].buffer = [
-  //  Message(moment().unix(), 'bot', 'An example URL, http://angularjs.org.')
-  //];
   
   this.networkByName = function (name) {
     return _.find(this.networks, { name: name });
@@ -61,7 +38,7 @@ app.service('IRCService', function (Network, Channel, Message) {
   
   this.current = {
     network: 'Idel',
-    channel: 'test'
+    channel: 'Status'
   };
 });
 
@@ -85,6 +62,7 @@ app.service('SettingsService', function () {
   this.layout = 'layouts/horizontal.html';
   this.theme = 'themes/dark.json';
 
+  // Use configured networks
   this.networks = [
     {
       name: 'Demonastery',
