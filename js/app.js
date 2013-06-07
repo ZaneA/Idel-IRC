@@ -11,11 +11,43 @@ app.controller('IdelController', function ($scope, $http, WindowService, Setting
     var parts = input.message.split(' ');
     if (parts[0].indexOf('/') === 0) {
       switch (parts[0]) {
+        case '/connect':
+          var _network = Network({
+            name: parts[1],
+            servers: [parts[2]],
+            nick: parts[3],
+            joinChannels: []
+          });
+
+          $scope.irc.networks.push(_network);
+
+          _network.connect();
+          break;
+        
+        case '/disconnect':
+          network.disconnect();
+          break;
+        
+        case '/join':
+          network.writeLine('JOIN ' + parts[1]);
+          break;
+
+        case '/part':
+          network.writeLine('PART ' + channel.name + ' :');
+          break;
+
         case '/help':
           $scope.irc.getChannel('Idel', 'Status').addLines('status', [
-            'Help:',
             '/help',
             '.. Show the help text',
+            '/connect <name> <host:port> <nick>',
+            '.. Connect to a server',
+            '/disconnect',
+            '.. Disconnect from a server',
+            '/join <channel>',
+            '.. Join channel',
+            '/part',
+            '.. Part channel',
             '/quote <line>',
             '.. Send raw text to the server'
           ]);
@@ -48,15 +80,4 @@ app.controller('IdelController', function ($scope, $http, WindowService, Setting
   });
 
   $scope.irc.getChannel('Idel', 'Status').addLine('status', 'Welcome to idel. Type /help to begin.');
-  
-  var network = Network({
-    name: 'Demonastery',
-    servers: ['irc.demonastery.org:6667'],
-    nick: 'testclient',
-    joinChannels: ['#Bottest']
-  });
-
-  $scope.irc.networks.push(network);
-  
-  network.connect();
 });

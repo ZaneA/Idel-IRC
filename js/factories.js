@@ -116,6 +116,19 @@ app.factory('Network', function ($rootScope, LineSocket, Channel) {
     switch (parts[0][0]) {
       case '':
         switch (parts[1][1]) {
+          case '332':
+            var channel = _.find(this.channels, {name: parts[1][3]});
+            channel.topic = parts[2].join(' ');
+            break;
+          
+          case 'TOPIC':
+            var channel = _.find(this.channels, {name: parts[1][2]});
+            channel.topic = parts[2].join(' ');
+            break;
+
+          case '333': // no idea
+            break;
+
           case '353': // Names
             var channel = _.find(this.channels, {name: parts[1][4]});
             Array.prototype.push.apply(channel.nicks, parts[2]);
@@ -140,7 +153,11 @@ app.factory('Network', function ($rootScope, LineSocket, Channel) {
             break;
           
           case 'JOIN':
-            this.channels.push(Channel(parts[2][0]));
+            this.channels.push(Channel(parts.length==3 ? parts[2][0] : parts[1][2]));
+            break;
+          
+          case 'PART':
+            this.channels = _.reject(this.channels, {name: parts.length==3 ? parts[2][0] : parts[1][2]});
             break;
           
           case 'PRIVMSG':
