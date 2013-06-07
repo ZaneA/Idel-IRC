@@ -43,7 +43,7 @@ app.service('IRCService', function (Network, Channel, Message, LineSocket) {
 });
 
 app.service('NickColor', function () {
-  this.colors = 5;
+  this.colors = 6;
   this.current = 0;
 
   this.get = _.memoize(function (nick) {

@@ -35,6 +35,19 @@ app.controller('IdelController', function ($scope, $http, WindowService, Setting
         case '/part':
           network.writeLine('PART ' + channel.name + ' :');
           break;
+        
+        case '/quote':
+          delete parts[0];
+          network.writeLine(parts.join(' '));
+          break;
+        
+        case '/layout':
+          $scope.settings.layout = 'layouts/' + parts[1] + '.html';
+          break;
+
+        case '/theme':
+          $scope.settings.theme = 'themes/' + parts[1] + '.json';
+          break;
 
         case '/help':
           $scope.irc.getChannel('Idel', 'Status').addLines('status', [
@@ -48,14 +61,13 @@ app.controller('IdelController', function ($scope, $http, WindowService, Setting
             '.. Join channel',
             '/part',
             '.. Part channel',
+            '/layout <layout>',
+            '.. Change layout',
+            '/theme <theme>',
+            '.. Change theme',
             '/quote <line>',
             '.. Send raw text to the server'
           ]);
-          break;
-        
-        case '/quote':
-          delete parts[0];
-          network.writeLine(parts.join(' '));
           break;
       }
     } else {

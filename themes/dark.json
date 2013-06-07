@@ -6,6 +6,7 @@
   "@color-borders": "#161616",
   "@color-input": "#0c0c0c",
   "@color-topic": "#fff",
+  "@color-chat-text": "#ddd",
   "@color-input-edge": "#222",
-  "@color-input-edge-hover": "#342"
+  "@color-input-edge-hover": "#447"
 }

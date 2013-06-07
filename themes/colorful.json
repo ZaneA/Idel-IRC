@@ -1,0 +1,14 @@
+{
+  "@color-background": "#eea090",
+  "@color-text": "#662011",
+  "@color-link": "#2cf",
+  "@color-logo": "#534",
+  "@color-borders": "#f4b2a2",
+  "@color-input": "#534",
+  "@color-input-text": "#fff",
+  "@color-topic": "#2cf",
+  "@color-input-edge": "#534",
+  "@color-input-edge-hover": "#534",
+  "@color-chat-separator": "url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAKCAYAAAB4zEQNAAAAN0lEQVQYV2NkQAI24jY+R14e2QITYoQxQBIwNkwBWBJZAlkBIzYJ4o1FNxrFToKSyF7CsJNkSQDdTxjm7HBM7wAAAABJRU5ErkJggg==)"
+}
+
