@@ -131,7 +131,7 @@ app.directive('colorize', function (NickColor) {
   return {
     restrict: 'A',
     link: function (scope, element, attrs) {
-      var className = 'color-' + (NickColor.get(attrs.colorize) + 1);
+      var className = 'color-' + (NickColor.get(scope.$eval(attrs.colorize)) + 1);
       element.addClass(className);
     }
   };

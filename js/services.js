@@ -1,4 +1,4 @@
-app.service('IRCService', function (Network, Channel, Message, LineSocket) {
+app.service('IRCService', function (Network, LineSocket) {
   this.networks = [];
 
   var idel = Network({ name: 'Idel' });
@@ -80,4 +80,80 @@ app.service('WindowService', function () {
   this.close = function () {
     window.close();
   };
+});
+
+app.service('InputService', function ($rootScope, IRCService, SettingsService, Network, Message) {
+  this._handlers = [];
+
+  this.register = function (regex, handler, desc) {
+    this._handlers.push({ regex: regex, handler: handler, desc: desc });
+  };
+
+  this.parse = function (line) {
+    var bindObject = {
+      network: IRCService.currentNetwork(),
+      channel: IRCService.currentChannel(),
+      statusChannel: IRCService.getChannel('Idel', 'Status')
+    };
+    
+    for (var i = 0; i < this._handlers.length; i++) {
+      var match = line.match(this._handlers[i].regex);
+      if (match) {
+        match.shift();
+        this._handlers[i].handler.apply(bindObject, match);
+        return;
+      }
+    }
+
+    bindObject.network.writeLine('PRIVMSG ' + bindObject.channel.name + ' :' + line);
+    $rootScope.$broadcast('irc::message', Message(moment().unix(), bindObject.network.nick, line));
+  };
+  
+  // COMMANDS GO HERE
+
+  var self = this; // HACK Would rather get rid of this
+
+  this.register(/^\/help/, function () {
+    for (var i = 0; i < self._handlers.length; i++) {
+      this.statusChannel.addLine({ name: 'status', mode: '' }, self._handlers[i].regex.toString() + ':');
+      this.statusChannel.addLine({ name: 'status', mode: '' }, ' - ' + self._handlers[i].desc);
+    }
+  }, 'Display a list of commands.');
+
+  this.register(/^\/connect (.*) (.*) (.*)/, function (name, server, nick) {
+    var network = Network({
+      name: name,
+      servers: [server],
+      nick: { name: nick, mode: '' },
+      joinChannels: []
+    });
+
+    IRCService.networks.push(network);
+
+    network.connect();
+  }, 'Connect to a server.');
+  
+  this.register(/^\/disconnect/, function () {
+    this.network.disconnect();
+  }, 'Disconnect from the current server.');
+
+  this.register(/^\/join (.*)/, function (channel) {
+    this.network.writeLine('JOIN ' + channel);
+  }, 'Join a channel.');
+
+  this.register(/^\/part/, function () {
+    this.network.writeLine('PART ' + this.channel.name + ' :');
+  }, 'Part the current channel.');
+
+  this.register(/^\/quote (.*)/, function (line) {
+    this.network.writeLine(line);
+  }, 'Send a raw string to the server.');
+
+  this.register(/^\/layout (.*)/, function (layout) {
+    SettingsService.layout = 'layouts/' + layout + '.html';
+  }, 'Change the current layout.');
+
+  this.register(/^\/theme (.*)/, function (theme) {
+    SettingsService.theme = 'themes/' + theme + '.json';
+  }, 'Change the current theme.');
 });

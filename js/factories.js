@@ -95,17 +95,17 @@ app.factory('Network', function ($rootScope, LineSocket, Channel) {
   };
   
   network.prototype.writeLine = function (line) {
-    this.channels[0].addLine('status', '> ' + line);
+    this.channels[0].addLine({ name: 'status', mode: '' }, '> ' + line);
     this._socket.writeLine(line);
   };
 
   network.prototype.onConnect = function () {
-    this.writeLine('NICK ' + this.nick);
-    this.writeLine('USER ' + this.nick + ' * * :' + this.nick);
+    this.writeLine('NICK ' + this.nick.name);
+    this.writeLine('USER ' + this.nick.name + ' * * :' + this.nick.name);
   };
   
   network.prototype.onMessage = function (line) {
-    this.channels[0].addLine('status', '< ' + line);
+    this.channels[0].addLine({ name: 'status', mode: '' }, '< ' + line);
     
     var parts = line.split(':');
     parts = _.map(parts, function (part) { return part.split(' '); });
@@ -131,7 +131,14 @@ app.factory('Network', function ($rootScope, LineSocket, Channel) {
 
           case '353': // Names
             var channel = _.find(this.channels, {name: parts[1][4]});
-            Array.prototype.push.apply(channel.nicks, parts[2]);
+            for (var i = 0; i < parts[2].length; i++) {
+              var mode = '';
+              if (parts[2][i][0] == '@') { // Op
+                mode += '@';
+                parts[2][i] = parts[2][i].substr(1);
+              }
+              channel.nicks.push({ name: parts[2][i], mode: mode });
+            }
             break;
 
           case '375': // Beginning of MOTD
@@ -146,7 +153,8 @@ app.factory('Network', function ($rootScope, LineSocket, Channel) {
             break;
           
           case '433': // Nick in use
-            this.writeLine('NICK ' + this.nick + '_');
+            this.nick.name += '_';
+            this.writeLine('NICK ' + this.nick.name);
             break;
           
           case 'MODE':
@@ -162,7 +170,8 @@ app.factory('Network', function ($rootScope, LineSocket, Channel) {
           
           case 'PRIVMSG':
             var channel = _.find(this.channels, {name: parts[1][2]});
-            channel.addLine(parts[1][0].split('!')[0], parts[2].join(' '));
+            var nick = _.find(this.channels.nicks, { name: parts[1][0].split('!')[0] });
+            channel.addLine(nick, parts[2].join(' '));
             break;
         }
         break;
@@ -196,16 +205,11 @@ app.factory('Channel', function (Message) {
       topic: null,
       nicks: [],
       buffer: [],
-      addLines: function (nick, messages, timestamp) {
-        messages.forEach(function (line) {
-          this.addLine(nick, line, timestamp);
-        }.bind(this));
-      },
       addLine: function (nick, message, timestamp) {
         var lines = message.split("\n");
-        lines.forEach(function (line) {
-          this.buffer.push(Message(timestamp || moment().unix(), nick, line));
-        }.bind(this));
+        for (var i = 0; i < lines.length; i++) {
+          this.buffer.push(Message(timestamp || moment().unix(), nick, lines[i]));
+        }
         this.activity = true;
       }
     };

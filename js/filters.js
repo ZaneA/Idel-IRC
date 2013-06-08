@@ -26,3 +26,16 @@ app.filter('timestamp', function () {
     return moment.unix(timestamp).format('h:mma');
   };
 });
+
+app.filter('nickify', function () {
+  return function (nick) {
+    return nick.mode + nick.name;
+  };
+});
+
+app.filter('irccolorize', function () {
+  return function (text) {
+    // Match color codes and transform
+    return text.replace(/\003([0-9][0-9])/g, '<span class="irc-color-$1">');
+  };
+});
