@@ -169,8 +169,8 @@ app.factory('Network', function ($rootScope, LineSocket, Channel) {
             break;
           
           case 'PRIVMSG':
-            var channel = _.find(this.channels, {name: parts[1][2]});
-            var nick = _.find(this.channels.nicks, { name: parts[1][0].split('!')[0] });
+            var channel = _.find(this.channels, { name: parts[1][2] });
+            var nick = _.find(channel.nicks, { name: parts[1][0].split('!')[0] });
             channel.addLine(nick, parts[2].join(' '));
             break;
         }

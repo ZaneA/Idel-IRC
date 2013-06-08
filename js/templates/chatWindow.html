@@ -1,7 +1,7 @@
 <ul>
   <li data-ng-repeat="line in buffer">
     <span class="timestamp" data-ng-bind="line.timestamp | timestamp"></span>
-    <span class="nick" data-ng-bind="line.nick | nickify" data-colorize="line.nick"></span>
+    <span class="nick" data-ng-bind="line.nick | nickify" data-colorize="line.nick.name"></span>
     <p data-ng-bind-html-unsafe="line.message | escape | irccolorize | linkify"></p>
   </li>
 </ul>
