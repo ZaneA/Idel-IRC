@@ -101,7 +101,7 @@ app.factory('Network', function ($rootScope, LineSocket, Channel, Nick) {
 
   network.prototype.onConnect = function () {
     this.writeLine('NICK ' + this.nick.name);
-    this.writeLine('USER ' + this.nick.name + ' * * :' + this.nick.name);
+    this.writeLine('USER ' + this.nick.name + ' 0 * :' + this.nick.name);
   };
   
   network.prototype.onMessage = function (line) {
@@ -147,9 +147,9 @@ app.factory('Network', function ($rootScope, LineSocket, Channel, Nick) {
 
           case '376': // End of MOTD
           case '422': // no idea
-            this.joinChannels.forEach(function (channel) {
-              this.writeLine('JOIN ' + channel);
-            }.bind(this));
+            if (this.joinChannels.length > 0) {
+              this.writeLine('JOIN ' + this.joinChannels.join(','));
+            }
             break;
           
           case '433': // Nick in use
