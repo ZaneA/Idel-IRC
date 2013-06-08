@@ -36,6 +36,15 @@ app.filter('nickify', function () {
 app.filter('irccolorize', function () {
   return function (text) {
     // Match color codes and transform
-    return text.replace(/\003([0-9][0-9])/g, '<span class="irc-color-$1">');
+    var regex = /\003([0-9][0-9])/;
+    var end = '';
+    var match = null;
+
+    while ((match = text.match(regex))) {
+      text = text.replace(regex, '<span class="irc-color-$1">');
+      end += '</span>';
+    }
+    
+    return text;
   };
 });

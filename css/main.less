@@ -18,11 +18,11 @@
 @color-button-close: #f55;
 
 @color-nick-1: #f55555;
-@color-nick-2: #4f8ac4;
-@color-nick-3: #cb62a8;
-@color-nick-4: #c4b54f;
-@color-nick-5: #73c34b;
-@color-nick-6: #4a44c1;
+@color-nick-2: #74d;
+@color-nick-3: #08f;
+@color-nick-4: #0ef;
+@color-nick-5: #0f8;
+@color-nick-6: #fc0;
 
 @color-channel-1: @color-nick-1;
 @color-channel-2: @color-nick-2;
@@ -31,7 +31,7 @@
 @color-channel-5: @color-nick-5;
 @color-channel-6: @color-nick-6;
 
-@color-irc-white: #fff;
+@color-irc-white: @color-text;
 @color-irc-black: #888;
 @color-irc-blue: #08f;
 @color-irc-green: #0f8;
@@ -407,19 +407,21 @@ input-box {
 .color-5 { color: @color-nick-5; &:hover { background: @color-nick-5; color: contrast(@color-nick-5); }}
 .color-6 { color: @color-nick-6; &:hover { background: @color-nick-6; color: contrast(@color-nick-6); }}
 
+// IRC Colors
+
 .irc-color-00 { font-weight: bold; color: @color-irc-white; }
-.irc-color-01 { color: @color-irc-black; }
-.irc-color-02 { color: @color-irc-blue; }
-.irc-color-03 { color: @color-irc-green; }
+.irc-color-01 { font-weight: normal; color: @color-irc-black; }
+.irc-color-02 { font-weight: normal; color: @color-irc-blue; }
+.irc-color-03 { font-weight: normal; color: @color-irc-green; }
 .irc-color-04 { font-weight: bold; color: @color-irc-red; }
-.irc-color-05 { color: @color-irc-red; }
-.irc-color-06 { color: @color-irc-purple; }
-.irc-color-07 { color: @color-irc-yellow; }
+.irc-color-05 { font-weight: normal; color: @color-irc-red; }
+.irc-color-06 { font-weight: normal; color: @color-irc-purple; }
+.irc-color-07 { font-weight: normal; color: @color-irc-yellow; }
 .irc-color-08 { font-weight: bold; color: @color-irc-yellow; }
 .irc-color-09 { font-weight: bold; color: @color-irc-green; }
-.irc-color-10 { color: @color-irc-cyan; }
+.irc-color-10 { font-weight: normal; color: @color-irc-cyan; }
 .irc-color-11 { font-weight: bold; color: @color-irc-cyan; }
 .irc-color-12 { font-weight: bold; color: @color-irc-blue; }
 .irc-color-13 { font-weight: bold; color: @color-irc-purple; }
 .irc-color-14 { font-weight: bold; color: @color-irc-black; }
-.irc-color-15 { color: @color-irc-white; }
+.irc-color-15 { font-weight: normal; color: @color-irc-white; }
