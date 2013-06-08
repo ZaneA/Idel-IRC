@@ -74,7 +74,7 @@ app.factory('LineSocket', function () {
   };
 });
 
-app.factory('Network', function ($rootScope, LineSocket, Channel) {
+app.factory('Network', function ($rootScope, LineSocket, Channel, Nick) {
   function network () {
     this.channels = [Channel('Status')];
   }
@@ -95,7 +95,7 @@ app.factory('Network', function ($rootScope, LineSocket, Channel) {
   };
   
   network.prototype.writeLine = function (line) {
-    this.channels[0].addLine({ name: 'status', mode: '' }, '> ' + line);
+    this.channels[0].addLine(Nick('status'), '> ' + line);
     this._socket.writeLine(line);
   };
 
@@ -105,7 +105,7 @@ app.factory('Network', function ($rootScope, LineSocket, Channel) {
   };
   
   network.prototype.onMessage = function (line) {
-    this.channels[0].addLine({ name: 'status', mode: '' }, '< ' + line);
+    this.channels[0].addLine(Nick('status'), '< ' + line);
     
     var parts = line.split(':');
     parts = _.map(parts, function (part) { return part.split(' '); });
@@ -137,7 +137,7 @@ app.factory('Network', function ($rootScope, LineSocket, Channel) {
                 mode += '@';
                 parts[2][i] = parts[2][i].substr(1);
               }
-              channel.nicks.push({ name: parts[2][i], mode: mode });
+              channel.nicks.push(Nick(parts[2][i], mode));
             }
             break;
 
@@ -161,17 +161,39 @@ app.factory('Network', function ($rootScope, LineSocket, Channel) {
             break;
           
           case 'JOIN':
-            this.channels.push(Channel(parts.length==3 ? parts[2][0] : parts[1][2]));
+            var nick = parts[1][0].split('!')[0];
+            if (nick == this.nick.name) { // It's us!
+              // Add ourselves to this new channel
+              this.channels.push(Channel(parts.length==3 ? parts[2][0] : parts[1][2]));
+            } else {
+              // Add nick to the channel
+              var channel = _.find(this.channels, {name: parts.length==3 ? parts[2][0] : parts[1][2]});
+              channel.nicks.push(Nick(nick));
+              channel.addLine(Nick(nick), '(joins)');
+            }
             break;
           
+          //case 'QUIT': // No channel given, need to enumerate, look for nick, remove nick from all :(
           case 'PART':
-            this.channels = _.reject(this.channels, {name: parts.length==3 ? parts[2][0] : parts[1][2]});
+            var nick = parts[1][0].split('!')[0];
+            if (nick == this.nick.name) { // It's us!
+              // Remove ourselves from this channel
+              this.channels = _.reject(this.channels, {name: parts.length==3 ? parts[2][0] : parts[1][2]});
+            } else {
+              // Remove nick from the channel
+              var channel = _.find(this.channels, {name: parts.length==3 ? parts[2][0] : parts[1][2]});
+              channel.nicks = _.reject(channel.nicks, Nick(nick));
+              channel.addLine(Nick(nick), '(leaves)');
+            }
             break;
           
+          case 'NOTICE':
           case 'PRIVMSG':
             var channel = _.find(this.channels, { name: parts[1][2] });
-            var nick = _.find(channel.nicks, { name: parts[1][0].split('!')[0] });
-            channel.addLine(nick, parts[2].join(' '));
+            if (channel) {
+              var nick = _.find(channel.nicks, { name: parts[1][0].split('!')[0] });
+              channel.addLine(nick, parts[2].join(' '));
+            }
             break;
         }
         break;
@@ -222,6 +244,15 @@ app.factory('Message', function () {
       timestamp: timestamp,
       nick: nick,
       message: message
+    };
+  };
+});
+
+app.factory('Nick', function () {
+  return function (name, mode) {
+    return {
+      name: name,
+      mode: mode || ''
     };
   };
 });

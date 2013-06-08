@@ -36,6 +36,10 @@ app.service('IRCService', function (Network, LineSocket) {
     return current;
   };
   
+  this.getStatusChannel = function (network) {
+    return this.getChannel(network || 'Idel', 'Status');
+  };
+  
   this.current = {
     network: 'Idel',
     channel: 'Status'
@@ -82,7 +86,7 @@ app.service('WindowService', function () {
   };
 });
 
-app.service('InputService', function ($rootScope, IRCService, SettingsService, Network, Message) {
+app.service('InputService', function ($rootScope, IRCService, SettingsService, Network, Message, Nick) {
   this._handlers = [];
 
   this.register = function (regex, handler, desc) {
@@ -93,7 +97,7 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, N
     var bindObject = {
       network: IRCService.currentNetwork(),
       channel: IRCService.currentChannel(),
-      statusChannel: IRCService.getChannel('Idel', 'Status')
+      statusChannel: IRCService.getStatusChannel()
     };
     
     for (var i = 0; i < this._handlers.length; i++) {
@@ -124,7 +128,7 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, N
     var network = Network({
       name: name,
       servers: [server],
-      nick: { name: nick, mode: '' },
+      nick: Nick(nick),
       joinChannels: []
     });
 
