@@ -116,6 +116,14 @@ app.factory('Network', function ($rootScope, LineSocket, Channel, Nick) {
     switch (parts[0][0]) {
       case '':
         switch (parts[1][1]) {
+          case '001': // Welcome
+            break;
+          
+          case '005': // Options
+            // :irc.demonastery.org 005 testclient CALLERID CASEMAPPING=rfc1459 DEAF=D KICKLEN=160 MODES=4 NICKLEN=15 PREFIX=(ohv)@%+ STATUSMSG=@%+ TOPICLEN=350 NETWORK=demonastery MAXLIST=beI:25 MAXTARGETS=4 CHANTYPES=#& :are supported by this server
+            // :irc.demonastery.org 005 testclient CHANLIMIT=#&:15 CHANNELLEN=50 CHANMODES=eIb,k,l,imnpst KNOCK ELIST=CMNTU SAFELIST AWAYLEN=160 EXCEPTS=e INVEX=I :are supported by this server
+            break;
+
           case '332':
             var channel = _.find(this.channels, {name: parts[1][3]});
             channel.topic = parts[2].join(' ');
@@ -131,6 +139,7 @@ app.factory('Network', function ($rootScope, LineSocket, Channel, Nick) {
 
           case '353': // Names
             var channel = _.find(this.channels, {name: parts[1][4]});
+            channel.nicks = [];
             for (var i = 0; i < parts[2].length; i++) {
               var mode = '';
               if (parts[2][i][0] == '@') { // Op
