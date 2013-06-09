@@ -79,6 +79,12 @@ app.factory('Network', function ($rootScope, LineSocket, Channel, Nick) {
     this.channels = [Channel('Status')];
   }
   
+  network.prototype._handlers = [];
+
+  network.prototype.register = function (desc, regex, handler) {
+    network.prototype._handlers.push({ regex: regex, handler: handler, desc: desc });
+  };
+  
   network.prototype.connect = function () {
     this._socket = LineSocket();
     
@@ -106,117 +112,143 @@ app.factory('Network', function ($rootScope, LineSocket, Channel, Nick) {
   
   network.prototype.onMessage = function (line) {
     this.channels[0].addLine(Nick('status'), '< ' + line);
-    
-    var parts = line.split(':');
-    parts = _.map(parts, function (part) { return part.split(' '); });
-    
-    if (parts[0] === undefined)
-      return;
 
-    switch (parts[0][0]) {
-      case '':
-        switch (parts[1][1]) {
+    for (var i = 0; i < network.prototype._handlers.length; i++) {
+      var match = line.match(network.prototype._handlers[i].regex);
+      if (match) {
+        match.shift();
+        network.prototype._handlers[i].handler.apply(this, match);
+        $rootScope.$apply();
+        return;
+      }
+    }
+  };
+  
+  // PROTOCOL HANDLING BELOW
+  
+  network.prototype.register(
+    'RFC1459::332::RPL_TOPIC',
+    /^:.*? 332 .*? (.*?) :(.*)$/,
+    function (channelName, topic) {
+      var channel = _.find(this.channels, { name: channelName });
+      channel.topic = topic;
+  });
+
+  network.prototype.register(
+    'RFC1459::TOPIC',
+    /^:(.*?) TOPIC (.*?) :(.*)$/,
+    function (user, channelName, topic) {
+      var channel = _.find(this.channels, { name: channelName });
+      channel.topic = topic;
+  });
+
+  network.prototype.register(
+    'RFC1459::353::RPL_NAMREPLY',
+    /^:.*? 353 .*? @ (.*?) :(.*)$/,
+    function (channelName, nicks) {
+      var channel = _.find(this.channels, { name: channelName });
+      channel.nicks = [];
+      var nicks = nicks.split(' ');
+      for (var i = 0; i < nicks.length; i++) {
+        var mode = '';
+        if (nicks[i][0] == '@' || nicks[i][0] == '+') { // Op
+          mode += nicks[i][0];
+          nicks[i] = nicks[i].substr(1);
+        }
+        channel.nicks.push(Nick(nicks[i], mode));
+      }
+  });
+
+  network.prototype.register(
+    'RFC1459::376::RPL_ENDOFMOTD',
+    /^:.*? (376|422)/,
+    function () {
+      if (this.joinChannels.length > 0) {
+        this.writeLine('JOIN ' + this.joinChannels.join(','));
+      }
+  });
+
+  network.prototype.register(
+    'RFC1459::433::ERR_NICKNAMEINUSE',
+    /^:.*? 433/,
+    function () {
+      this.nick.name += '_';
+      this.writeLine('NICK ' + this.nick.name);
+  });
+
+  network.prototype.register(
+    'RFC1459::JOIN',
+    /^:(.*?)!.*? JOIN :?(.*?)$/,
+    function (nick, channelName) {
+      if (nick == this.nick.name) { // It's us!
+        // Add ourselves to this new channel
+        this.channels.push(Channel(channelName));
+      } else {
+        // Add nick to the channel
+        var channel = _.find(this.channels, { name: channelName });
+        channel.nicks.push(Nick(nick));
+        channel.addLine(Nick(nick), '(joins)');
+      }
+  });
+
+  network.prototype.register(
+    'RFC1459::PART',
+    /^:(.*?)!.*? PART :?(.*?)$/,
+    function (nick, channelName) {
+      if (nick == this.nick.name) { // It's us!
+        // Remove ourselves from this channel
+        this.channels = _.reject(this.channels, { name: channelName });
+      } else {
+        // Remove nick from the channel
+        var channel = _.find(this.channels, { name: channelName });
+        channel.nicks = _.reject(channel.nicks, Nick(nick));
+        channel.addLine(Nick(nick), '(leaves)');
+      }
+  });
+  
+  network.prototype.register(
+    'RFC1459::PING',
+    /^PING :(.*)$/,
+    function (reply) {
+      this.writeLine('PONG :' + reply);
+  });
+
+  network.prototype.register(
+    'RFC1459::NOTICE|RFC1459::PRIVMSG',
+    /^:(.*?)!.*? (NOTICE|PRIVMSG) (.*?) :(.*)$/,
+    function (nick, type, channelName, message) {
+      var channel = _.find(this.channels, { name: channelName });
+      if (channel) {
+        var nick = _.find(channel.nicks, { name: nick });
+        channel.addLine(nick, message);
+      }
+  });
+
+    /*
           case '001': // Welcome
-            break;
-          
+
           case '005': // Options
             // :irc.demonastery.org 005 testclient CALLERID CASEMAPPING=rfc1459 DEAF=D KICKLEN=160 MODES=4 NICKLEN=15 PREFIX=(ohv)@%+ STATUSMSG=@%+ TOPICLEN=350 NETWORK=demonastery MAXLIST=beI:25 MAXTARGETS=4 CHANTYPES=#& :are supported by this server
             // :irc.demonastery.org 005 testclient CHANLIMIT=#&:15 CHANNELLEN=50 CHANMODES=eIb,k,l,imnpst KNOCK ELIST=CMNTU SAFELIST AWAYLEN=160 EXCEPTS=e INVEX=I :are supported by this server
-            break;
-
-          case '332':
-            var channel = _.find(this.channels, {name: parts[1][3]});
-            channel.topic = parts[2].join(' ');
-            break;
-          
-          case 'TOPIC':
-            var channel = _.find(this.channels, {name: parts[1][2]});
-            channel.topic = parts[2].join(' ');
-            break;
 
           case '333': // no idea
-            break;
-
-          case '353': // Names
-            var channel = _.find(this.channels, {name: parts[1][4]});
-            channel.nicks = [];
-            for (var i = 0; i < parts[2].length; i++) {
-              var mode = '';
-              if (parts[2][i][0] == '@') { // Op
-                mode += '@';
-                parts[2][i] = parts[2][i].substr(1);
-              }
-              channel.nicks.push(Nick(parts[2][i], mode));
-            }
             break;
 
           case '375': // Beginning of MOTD
           case '372': // MOTD
             break;
-
-          case '376': // End of MOTD
-          case '422': // no idea
-            if (this.joinChannels.length > 0) {
-              this.writeLine('JOIN ' + this.joinChannels.join(','));
-            }
-            break;
-          
-          case '433': // Nick in use
-            this.nick.name += '_';
-            this.writeLine('NICK ' + this.nick.name);
-            break;
           
           case 'MODE':
             break;
           
-          case 'JOIN':
-            var nick = parts[1][0].split('!')[0];
-            if (nick == this.nick.name) { // It's us!
-              // Add ourselves to this new channel
-              this.channels.push(Channel(parts.length==3 ? parts[2][0] : parts[1][2]));
-            } else {
-              // Add nick to the channel
-              var channel = _.find(this.channels, {name: parts.length==3 ? parts[2][0] : parts[1][2]});
-              channel.nicks.push(Nick(nick));
-              channel.addLine(Nick(nick), '(joins)');
-            }
-            break;
-          
           //case 'QUIT': // No channel given, need to enumerate, look for nick, remove nick from all :(
           case 'PART':
-            var nick = parts[1][0].split('!')[0];
-            if (nick == this.nick.name) { // It's us!
-              // Remove ourselves from this channel
-              this.channels = _.reject(this.channels, {name: parts.length==3 ? parts[2][0] : parts[1][2]});
-            } else {
-              // Remove nick from the channel
-              var channel = _.find(this.channels, {name: parts.length==3 ? parts[2][0] : parts[1][2]});
-              channel.nicks = _.reject(channel.nicks, Nick(nick));
-              channel.addLine(Nick(nick), '(leaves)');
-            }
-            break;
-          
-          case 'NOTICE':
-          case 'PRIVMSG':
-            var channel = _.find(this.channels, { name: parts[1][2] });
-            if (channel) {
-              var nick = _.find(channel.nicks, { name: parts[1][0].split('!')[0] });
-              channel.addLine(nick, parts[2].join(' '));
-            }
             break;
         }
         break;
 
-      case 'PING':
-        this.writeLine('PONG :' + parts[1].join(' '));
-        break;
-      
       case 'ERROR':
-        break;
-    }
-
-    $rootScope.$apply();
-  };
+     */
   
   network.prototype.onDisconnect = function () {
     console.log('Disconnected.');
