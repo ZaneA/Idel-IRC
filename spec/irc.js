@@ -89,6 +89,14 @@ describe('IRC Connection', function () {
       expect(network.channels[0].nicks[0]).toBeUndefined();
     });
   });
+
+  describe('RFC1459::QUIT', function () {
+    it('should handle others quitting', function () {
+      network.channels[0].nicks = [ _Nick('you') ];
+      network.onMessage(':you!user@host QUIT :message');
+      expect(network.channels[0].nicks[0]).toBeUndefined();
+    });
+  });
   
   describe('RFC1459::PING', function () {
     it('should reply with PONG', function () {

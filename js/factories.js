@@ -144,10 +144,9 @@ app.factory('Network', function ($rootScope, LineSocket, Channel, Nick) {
 
   network.prototype.register(
     'RFC1459::353::RPL_NAMREPLY',
-    /^:.*? 353 .*? @ (.*?) :(.*)$/,
+    /^:.*? 353 .*? . (.*?) :(.*)$/,
     function (channelName, nicks) {
       var channel = _.find(this.channels, { name: channelName });
-      channel.nicks = [];
       var nicks = nicks.split(' ');
       for (var i = 0; i < nicks.length; i++) {
         var mode = '';
@@ -188,6 +187,22 @@ app.factory('Network', function ($rootScope, LineSocket, Channel, Nick) {
         var channel = _.find(this.channels, { name: channelName });
         channel.nicks.push(Nick(nick));
         channel.addLine(Nick(nick), '(joins)');
+      }
+  });
+  
+  network.prototype.register(
+    'RFC1459::QUIT',
+    /^:(.*?)!.*? QUIT :(.*)$/,
+    function (nick, message) {
+      for (var i = 0; i < this.channels.length; i++) {
+        this.channels[i].nicks = _.reject(this.channels[i].nicks, function (_nick) {
+          if (_nick.name == nick) {
+            this.channels[i].addLine(_nick, '(quits)');
+            return true;
+          }
+          
+          return false;
+        }, this);
       }
   });
 
