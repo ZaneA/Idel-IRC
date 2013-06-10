@@ -1,4 +1,3 @@
-// This part should abstract windowing functions, and eventually the socket stuff should be moved here too
 app.service('PortService', function () {
   this.canMinimize = true;
   this.minimizeWindow = function () {

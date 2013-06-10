@@ -65,18 +65,9 @@ app.service('NickColor', function () {
 app.service('SettingsService', function () {
   this.layout = 'layouts/horizontal.html';
   this.theme = 'themes/dark.json';
-
-  // Use configured networks
-  this.networks = [
-    {
-      name: 'Demonastery',
-      servers: ['irc.demonastery.org:6667'],
-      nick: 'zanea'
-    }
-  ];
 });
 
-app.service('InputService', function ($rootScope, IRCService, SettingsService, Network, Message, Nick) {
+app.service('InputService', function ($rootScope, IRCService, SettingsService, ColorService, Network, Message, Nick) {
   this._handlers = [];
 
   this.register = function (regex, handler, desc) {
@@ -109,8 +100,8 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, N
 
   this.register(/^\/help/, function () {
     for (var i = 0; i < self._handlers.length; i++) {
-      this.statusChannel.addLine({ name: 'status', mode: '' }, self._handlers[i].regex.toString() + ':');
-      this.statusChannel.addLine({ name: 'status', mode: '' }, ' - ' + self._handlers[i].desc);
+      this.statusChannel.addLine(null, ColorService._white + self._handlers[i].regex.toString(), 1);
+      this.statusChannel.addLine(null, ColorService.black + '    ' + self._handlers[i].desc, 1);
     }
   }, 'Display a list of commands.');
 
@@ -150,4 +141,11 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, N
   this.register(/^\/theme (.*)/, function (theme) {
     SettingsService.theme = 'themes/' + theme + '.json';
   }, 'Change the current theme.');
+});
+
+app.service('ColorService', function () {
+  var colors = '_white black blue green _red red purple yellow _yellow _green cyan _cyan _blue _purple _black'.split(' ');
+  for (var i = 0; i < colors.length; i++) {
+    this[colors[i]] = "\003" + ('0' + i.toString()).substr(-2);
+  }
 });

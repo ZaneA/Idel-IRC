@@ -1,6 +1,6 @@
 var app = angular.module('IdelApp', []);
 
-app.controller('IdelController', function ($scope, $http, PortService, SettingsService, IRCService, InputService, Nick) {
+app.controller('IdelController', function ($scope, $http, PortService, SettingsService, IRCService, InputService, Nick, ColorService) {
   $scope.settings = SettingsService;
   $scope.irc = IRCService;
   $scope.port = PortService;
@@ -19,5 +19,5 @@ app.controller('IdelController', function ($scope, $http, PortService, SettingsS
     });
   });
 
-  $scope.irc.getStatusChannel().addLine(Nick('status'), 'Welcome to idel. Type /help to begin.');
+  $scope.irc.getStatusChannel().addLine(null, ColorService.blue + 'Welcome to idel. Type /help to begin.', 1);
 });
