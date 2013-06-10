@@ -76,16 +76,6 @@ app.service('SettingsService', function () {
   ];
 });
 
-app.service('WindowService', function () {
-  this.minimize = function () {
-    chrome.app.window.current().minimize();
-  };
-  
-  this.close = function () {
-    window.close();
-  };
-});
-
 app.service('InputService', function ($rootScope, IRCService, SettingsService, Network, Message, Nick) {
   this._handlers = [];
 
