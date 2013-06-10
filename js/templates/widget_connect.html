@@ -1,0 +1,17 @@
+<div data-ng-controller="ConnectController">
+  <form>
+    <h1>Network Name</h1>
+    <input type="text" data-ng-model="name" placeholder="Freenode" />
+    <h1>Server</h1>
+    <input type="text" data-ng-model="url" placeholder="chat.freenode.net:6667" />
+    <h1>Nickname</h1>
+    <input type="text" data-ng-model="nick" placeholder="Idel" />
+    <h1>Theme</h1>
+    <select data-ng-model="theme">
+      <option value="themes/dark.json">Dark</option>
+      <option value="themes/light.json">Light</option>
+      <option value="themes/colorful.json">Colorful</option>
+    </select>
+    <button data-ng-click="connect()">Go</button>
+  </form>
+</div>

@@ -14,7 +14,6 @@ app.factory('LineSocket', function () {
       self._socket = createInfo.socketId;
       
       chrome.socket.connect(self._socket, host, parseInt(port), function (result) {
-        console.log('Connect returned ' + result);
         self._onConnect();
         self.readLoop();
       });
@@ -31,8 +30,6 @@ app.factory('LineSocket', function () {
     var self = this;
 
     chrome.socket.read(this._socket, null, function (result) {
-      console.log('Read: ' + result.resultCode);
-
       if (result.resultCode < 0)
         return;
 
@@ -51,9 +48,7 @@ app.factory('LineSocket', function () {
   
   lineSocket.prototype.writeLine = function (line) {
     line += "\r\n";
-    chrome.socket.write(this._socket, this.stringToArrayBuffer(line), function (result) {
-      console.log('onWriteCompleteCallback: ' + result.bytesWritten);
-    });
+    chrome.socket.write(this._socket, this.stringToArrayBuffer(line), function (result) {});
   };
   
   lineSocket.prototype.arrayBufferToString = function (buffer) {
@@ -124,29 +119,33 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
     }
   };
   
+  // HELPERS
+
+  network.prototype.findChannel = function (name) {
+    return _.find(this.channels, { name: name });
+  };
+  
   // PROTOCOL HANDLING BELOW
   
   network.prototype.register(
     'RFC1459::332::RPL_TOPIC',
     /^:.*? 332 .*? (.*?) :(.*)$/,
     function (channelName, topic) {
-      var channel = _.find(this.channels, { name: channelName });
-      channel.topic = topic;
+      this.findChannel(channelName).topic = topic;
   });
 
   network.prototype.register(
     'RFC1459::TOPIC',
     /^:(.*?) TOPIC (.*?) :(.*)$/,
     function (user, channelName, topic) {
-      var channel = _.find(this.channels, { name: channelName });
-      channel.topic = topic;
+      this.findChannel(channelName).topic = topic;
   });
 
   network.prototype.register(
     'RFC1459::353::RPL_NAMREPLY',
     /^:.*? 353 .*? . (.*?) :(.*)$/,
     function (channelName, nicks) {
-      var channel = _.find(this.channels, { name: channelName });
+      var channel = this.findChannel(channelName);
       var nicks = nicks.split(' ');
       for (var i = 0; i < nicks.length; i++) {
         var mode = '';
@@ -184,7 +183,7 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
         this.channels.push(Channel(channelName));
       } else {
         // Add nick to the channel
-        var channel = _.find(this.channels, { name: channelName });
+        var channel = this.findChannel(channelName);
         channel.nicks.push(Nick(nick));
         channel.addLine(null, ColorService.green + nick + ' joins', 1);
       }
@@ -216,7 +215,7 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
       } else {
         // Remove nick from the channel
         console.log(channelName);
-        var channel = _.find(this.channels, { name: channelName });
+        var channel = this.findChannel(channelName);
         console.log(this.channels);
         console.log(channel);
         channel.nicks = _.reject(channel.nicks, Nick(nick));
@@ -235,7 +234,7 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
     'RFC1459::NOTICE|RFC1459::PRIVMSG',
     /^:(.*?)!.*? (NOTICE|PRIVMSG) (.*?) :(.*)$/,
     function (nick, type, channelName, message) {
-      var channel = _.find(this.channels, { name: channelName });
+      var channel = this.findChannel(channelName);
       if (channel) {
         var nick = _.find(channel.nicks, { name: nick });
         channel.addLine(nick, message);
@@ -269,7 +268,7 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
      */
   
   network.prototype.onDisconnect = function () {
-    console.log('Disconnected.');
+    this.findChannel('Status').addLine(null, ColorService._red + 'Disconnected.', 1);
     // TODO Reconnect logic
   };
 

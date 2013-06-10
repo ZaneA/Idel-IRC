@@ -19,5 +19,5 @@ app.controller('IdelController', function ($scope, $http, PortService, SettingsS
     });
   });
 
-  $scope.irc.getStatusChannel().addLine(null, ColorService.blue + 'Welcome to idel. Type /help to begin.', 1);
+  $scope.irc.getStatusChannel().addLine(null, 'connect', 3); // Show connect widget
 });

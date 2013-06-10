@@ -5,7 +5,11 @@
       <span data-ng-switch-when="0" class="nick type-0" data-ng-bind="line.nick | nickify" data-colorize="line.nick.name"></span>
       <span data-ng-switch-when="1" class="nick type-1">-</span>
       <span data-ng-switch-when="2" class="nick type-2">- <span data-ng-bind="line.nick | nickify" data-colorize="line.nick.name"></span></span>
+      <span data-ng-switch-when="3" class="nick type-3"></span>
     </ng-switch>
-    <p data-ng-bind-html-unsafe="line.message | escape | irccolorize | linkify"></p>
+    <ng-switch on="line.type">
+      <p data-ng-switch-default data-ng-bind-html-unsafe="line.message | escape | irccolorize | linkify"></p>
+      <div data-ng-switch-when="3" class="widget" data-ng-include="'js/templates/widget_' + line.message + '.html'"></div>
+    </ng-switch>
   </li>
 </ul>

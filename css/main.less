@@ -408,6 +408,62 @@ input-box {
   }
 }
 
+.widget {
+  //margin: 20px 0;
+  padding: 20px 10px;
+  margin-left: 175px;
+
+  width: 350px;
+  
+  h1 {
+    color: #444;
+    font-size: 1.2em;
+    margin-bottom: 6px;
+  }
+  
+  input, select {
+    display: block;
+    width: 100%;
+
+    padding: 8px 12px;
+    margin-bottom: 15px;
+    background: @color-input;
+    color: @color-input-text;
+    border: none;
+    border-bottom: 2px solid @color-input-edge;
+
+    font-family: @font-mono;
+    font-size: 0.9em;
+    font-weight: bold;
+    
+    box-shadow: inset 0 4px 4px 0 darken(@color-input, 8%);
+    
+    position: relative;
+    
+    &:focus {
+      outline: none;
+      border-bottom: 2px solid @color-input-edge-hover;
+      box-shadow: inset 0 4px 4px 0 darken(@color-input, 8%), 0 0 16px 0 fade(@color-input-edge-hover, 10%);
+      &::-webkit-input-placeholder {
+        color: transparent;
+      }
+    }
+    
+    &::-webkit-input-placeholder {
+      color: #222;
+    }
+  }
+  
+  button {
+    float: right;
+    display: block;
+
+    &:hover {
+      background: @color-irc-green;
+    }
+  }
+}
+
 // Nick colors
 
 .color-1 { color: @color-nick-1; &:hover { background: @color-nick-1; color: contrast(@color-nick-1); }}
