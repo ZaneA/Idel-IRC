@@ -70,7 +70,7 @@ app.directive('nickList', function () {
   };
 });
 
-app.directive('inputBox', function () {
+app.directive('inputBox', function (InputService) {
   return {
     templateUrl: 'js/templates/inputBox.html',
     restrict: 'E',
@@ -90,6 +90,12 @@ app.directive('inputBox', function () {
       };
 
       $element.children()[0].onkeydown = function (ev) {
+        if (ev.keyCode == 9 && $scope.input.length > 0) { // Tab
+          $scope.$apply(function () {
+            $scope.input = InputService.autocomplete($scope.input);
+          });
+        }
+
         if (ev.keyCode == 13 && $scope.input.length > 0) { // Enter
           $scope.$apply(function () {
             $rootScope.$broadcast('ui::input-box::send', {

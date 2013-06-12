@@ -107,6 +107,26 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
     return desc;
   }
   
+  this.autocomplete = function (line) {
+    for (var i = 0; i < this._handlers.length; i++) {
+      var desc = regex2description(this._handlers[i].regex.toString(),
+                                   this._handlers[i].handler.toString());
+      if (_.str.startsWith(desc, line)) {
+        return desc + ' ';
+      }
+    }
+    
+    var channel = IRCService.currentChannel();
+
+    for (var i = 0; i < channel.nicks.length; i++) {
+      if (_.str.startsWith(channel.nicks[i].name, line)) {
+        return channel.nicks[i].name + ', ';
+      }
+    }
+    
+    return line;
+  };
+  
   // COMMANDS GO HERE
 
   var self = this; // HACK Would rather get rid of this
