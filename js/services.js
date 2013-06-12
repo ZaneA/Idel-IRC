@@ -167,6 +167,10 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
       this.channel.addLine(null, ColorService._red + (message.nick ? message.nick : 'status') + ': ' + message.message, 1);
     }, this);
   }, 'Search the current buffer for term.');
+  
+  this.register(/^\/nick (.*)/, function (nick) {
+    this.network.writeLine('NICK %s', nick);
+  }, 'Change your nickname.');
 });
 
 app.service('ColorService', function () {

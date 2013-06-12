@@ -243,6 +243,27 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
         channel.addLine(nick, message);
       }
   });
+  
+  network.prototype.register(
+    'RFC1459::NICK',
+    /^:(.*?)!.*? NICK :(.*)$/,
+    function (oldnick, newnick) {
+      _.each(this.channels, function (channel) {
+        var nick = _.find(channel.nicks, { name: oldnick });
+
+        if (!nick) return;
+
+        nick.name = newnick;
+
+        if (this.nick.name == oldnick)
+          this.nick.name = newnick;
+
+        channel.addLine(null, ColorService._white + oldnick +
+                        ColorService.reset + ' is now'
+                        + ' known as ' + ColorService._white +
+                        newnick, 1);
+      }, this);
+  });
 
     /*
           case '001': // Welcome
