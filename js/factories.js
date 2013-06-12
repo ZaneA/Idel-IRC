@@ -298,7 +298,7 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
   };
 });
 
-app.factory('Channel', function (Message) {
+app.factory('Channel', function () {
   return function (name) {
     return {
       name: name,
@@ -314,25 +314,15 @@ app.factory('Channel', function (Message) {
 
         var lines = message.split("\n");
         for (var i = 0; i < lines.length; i++) {
-          this.buffer.push(Message(moment().unix(), nick, lines[i], type));
+          this.buffer.push({
+            type: type,
+            timestamp: moment().unix(),
+            nick: nick,
+            message: lines[i]
+          });
         }
         this.activity = true;
       }
-    };
-  };
-});
-
-app.factory('Message', function () {
-  // Message types:
-  // 0 - Message
-  // 1 - Status Message
-  // 2 - Action
-  return function (timestamp, nick, message, type) {
-    return {
-      type: type,
-      timestamp: timestamp,
-      nick: nick,
-      message: message
     };
   };
 });

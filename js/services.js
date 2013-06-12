@@ -67,7 +67,7 @@ app.service('SettingsService', function () {
   this.theme = 'themes/dark.json';
 });
 
-app.service('InputService', function ($rootScope, IRCService, SettingsService, ColorService, Network, Message, Nick) {
+app.service('InputService', function ($rootScope, IRCService, SettingsService, ColorService, Network, Nick) {
   this._handlers = [];
 
   this.register = function (regex, handler, desc) {
@@ -92,7 +92,7 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
     }
 
     bindObject.network.writeLine('PRIVMSG %s :%s', bindObject.channel.name, line);
-    $rootScope.$broadcast('irc::message', Message(moment().unix(), bindObject.network.nick, line, 0));
+    bindObject.channel.addLine(0, bindObject.network.nick, line);
   };
   
   // Bit of a hack to take a registered handler (regex + callback) and turn it into a nice command description

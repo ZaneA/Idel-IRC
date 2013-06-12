@@ -42,10 +42,6 @@ app.directive('chatWindow', function () {
       buffer: '=for'
     },
     controller: function ($scope, $element, $timeout) {
-      $scope.$on('irc::message', function (ev, message) {
-        $scope.buffer.push(message);
-      });
-      
       // Scroll to bottom.
       $scope.$watch('buffer', function () {
         $timeout(function () {
