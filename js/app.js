@@ -18,6 +18,8 @@ app.controller('IdelController', function ($scope, $http, PortService, SettingsS
       less.modifyVars(theme);
     });
   });
+  
+  $scope.test = 'hello';
 
   $scope.irc.getStatusChannel().addLine(null, 'connect', 3); // Show connect widget
 });

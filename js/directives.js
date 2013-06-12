@@ -89,7 +89,7 @@ app.directive('inputBox', function () {
         $scope.input += args.nick + ', ';
       });
 
-      $element.children()[0].onkeydown = function (ev) {
+      $element.children()[1].onkeydown = function (ev) {
         if (ev.keyCode == 13 && $scope.input.length > 0) { // Enter
           $scope.$apply(function () {
             $rootScope.$broadcast('ui::input-box::send', {
@@ -128,6 +128,19 @@ app.directive('colorize', function (NickColor) {
     link: function (scope, element, attrs) {
       var className = 'color-' + (NickColor.get(scope.$eval(attrs.colorize)) + 1);
       element.addClass(className);
+    }
+  };
+});
+
+app.directive('editableLabel', function () {
+  return {
+    restrict: 'E',
+    templateUrl: 'js/templates/editableLabel.html',
+    scope: {
+      model: '=model'
+    },
+    link: function (scope, element, attrs) {
+      scope.editing = false;
     }
   };
 });

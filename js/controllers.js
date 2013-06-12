@@ -1,4 +1,4 @@
-app.controller('ConnectController', function ($scope, $http, IRCService, Network, Nick) {
+app.controller('ConnectController', function ($scope, $http, SettingsService, IRCService, Network, Nick) {
   // Connect Button
   $scope.connect = function () {
     var network = Network({
@@ -15,8 +15,6 @@ app.controller('ConnectController', function ($scope, $http, IRCService, Network
 
   $scope.$watch('theme', function (val) {
     if (!val) return;
-    $http.get(val).success(function (theme) {
-      less.modifyVars(theme);
-    });
+    SettingsService.theme = val;
   });
 });
