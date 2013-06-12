@@ -1,7 +1,6 @@
 app.filter('escape', function () {
   return function (text) {
     if (!text) return '';
-
     return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   };
 });
@@ -14,8 +13,6 @@ app.filter('linkify', function () {
   };
 
   return function (text) {
-    if (!text) return '';
-
     var urlPattern = /\b(?:https?|ftp):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*[a-z0-9-+&@#\/%=~_|]/gim;
     return text.replace(urlPattern, urlPatternReplacer);
   };

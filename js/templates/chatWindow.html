@@ -7,9 +7,6 @@
       <span data-ng-switch-when="2" class="nick type-2">- <span data-ng-bind="line.nick | nickify" data-colorize="line.nick.name"></span></span>
       <span data-ng-switch-when="3" class="nick type-3"></span>
     </ng-switch>
-    <ng-switch on="line.type">
-      <p data-ng-switch-default data-ng-bind-html-unsafe="line.message | escape | irccolorize | linkify"></p>
-      <div data-ng-switch-when="3" class="widget" data-ng-include="'js/templates/widget_' + line.message + '.html'"></div>
-    </ng-switch>
+    <p data-ng-bind-html-unsafe="line.message | escape | irccolorize | linkify"></p>
   </li>
 </ul>
