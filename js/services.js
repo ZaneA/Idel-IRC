@@ -72,6 +72,7 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
 
   this.register = function (regex, handler, desc) {
     this._handlers.push({ regex: regex, handler: handler, desc: desc });
+    this._handlers = _.sortBy(this._handlers, 'regex');
   };
 
   this.parse = function (line) {
@@ -154,6 +155,18 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
   this.register(/^\/theme (.*)/, function (theme) {
     SettingsService.theme = 'themes/' + theme + '.json';
   }, 'Change the current theme.');
+  
+  this.register(/^\/clear/, function () {
+    this.channel.buffer = [];
+  }, 'Clear the current channel\'s buffer.');
+  
+  this.register(/^\/search (.*)/, function (term) {
+    _.each(_.filter(this.channel.buffer, function (line) {
+      return _.str.include(line.message, term);
+    }), function (message) {
+      this.channel.addLine(null, ColorService._red + (message.nick ? message.nick : 'status') + ': ' + message.message, 1);
+    }, this);
+  }, 'Search the current buffer for term.');
 });
 
 app.service('ColorService', function () {
