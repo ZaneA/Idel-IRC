@@ -51,6 +51,6 @@ app.filter('irccolorize', function () {
       text = text.replace(resetRegex, end.pop());
     }
     
-    return text + end.join();
+    return text + end.join('');
   };
 });

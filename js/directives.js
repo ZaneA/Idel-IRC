@@ -89,6 +89,10 @@ app.directive('inputBox', function () {
         $scope.input += args.nick + ', ';
       });
 
+      $element.children()[0].onblur = function (ev) {
+        this.focus();
+      };
+
       $element.children()[0].onkeydown = function (ev) {
         if (ev.keyCode == 13 && $scope.input.length > 0) { // Enter
           $scope.$apply(function () {

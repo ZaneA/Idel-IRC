@@ -94,13 +94,26 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
     $rootScope.$broadcast('irc::message', Message(moment().unix(), bindObject.network.nick, line));
   };
   
+  // Bit of a hack to take a registered handler (regex + callback) and turn it into a nice command description
+  function regex2description(regex, func) {
+    var desc = regex.match(/\/\^?\\?(\/.*)\//)[1];
+    var args = func.toString().match(/function \((.*?)\)/)[1].split(',');
+    
+    while (args.length > 0) {
+      desc = desc.replace('(.*)', ColorService.yellow + '<' + _.str.trim(args.shift()) + '>');
+    }
+
+    return desc;
+  }
+  
   // COMMANDS GO HERE
 
   var self = this; // HACK Would rather get rid of this
 
   this.register(/^\/help/, function () {
     for (var i = 0; i < self._handlers.length; i++) {
-      this.statusChannel.addLine(null, ColorService._white + self._handlers[i].regex.toString(), 1);
+      var description = regex2description(self._handlers[i].regex.toString(), self._handlers[i].handler.toString());
+      this.statusChannel.addLine(null, ColorService._white + description, 1);
       this.statusChannel.addLine(null, ColorService.black + '    ' + self._handlers[i].desc, 1);
     }
   }, 'Display a list of commands.');
