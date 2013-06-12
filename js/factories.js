@@ -95,14 +95,15 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
     this._socket.disconnect();
   };
   
-  network.prototype.writeLine = function (line) {
+  network.prototype.writeLine = function () {
+    var line = _.str.sprintf.apply(this, arguments);
     this.channels[0].addLine(null, ColorService.black + '> ' + line, 1);
     this._socket.writeLine(line);
   };
 
   network.prototype.onConnect = function () {
-    this.writeLine('NICK ' + this.nick.name);
-    this.writeLine('USER ' + this.nick.name + ' 0 * :' + this.nick.name);
+    this.writeLine('NICK %s', this.nick.name);
+    this.writeLine('USER %s 0 * :%s', this.nick.name, this.nick.name);
   };
   
   network.prototype.onMessage = function (line) {
@@ -162,7 +163,7 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
     /^:.*? (376|422)/,
     function () {
       if (this.joinChannels.length > 0) {
-        this.writeLine('JOIN ' + this.joinChannels.join(','));
+        this.writeLine('JOIN %s', this.joinChannels.join(','));
       }
   });
 
@@ -171,7 +172,7 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
     /^:.*? 433/,
     function () {
       this.nick.name += '_';
-      this.writeLine('NICK ' + this.nick.name);
+      this.writeLine('NICK %s', this.nick.name);
   });
 
   network.prototype.register(
@@ -180,7 +181,9 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
     function (nick, channelName) {
       if (nick == this.nick.name) { // It's us!
         // Add ourselves to this new channel
-        this.channels.push(Channel(channelName));
+        var channel = Channel(channelName);
+        channel.addLine(null, ColorService.green + 'Joined ' + channelName + '.', 1);
+        this.channels.push(channel);
       } else {
         // Add nick to the channel
         var channel = this.findChannel(channelName);
@@ -227,7 +230,7 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
     'RFC1459::PING',
     /^PING :(.*)$/,
     function (reply) {
-      this.writeLine('PONG :' + reply);
+      this.writeLine('PONG :%s', reply);
   });
 
   network.prototype.register(
@@ -268,7 +271,10 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
      */
   
   network.prototype.onDisconnect = function () {
-    this.findChannel('Status').addLine(null, ColorService._red + 'Disconnected.', 1);
+    _.each(this.channels, function (channel) {
+      channel.addLine(null, ColorService._red + 'Disconnected.', 1);
+    });
+
     // TODO Reconnect logic
   };
 

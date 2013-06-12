@@ -90,8 +90,8 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
       }
     }
 
-    bindObject.network.writeLine('PRIVMSG ' + bindObject.channel.name + ' :' + line);
-    $rootScope.$broadcast('irc::message', Message(moment().unix(), bindObject.network.nick, line));
+    bindObject.network.writeLine('PRIVMSG %s :%s', bindObject.channel.name, line);
+    $rootScope.$broadcast('irc::message', Message(moment().unix(), bindObject.network.nick, line, 0));
   };
   
   // Bit of a hack to take a registered handler (regex + callback) and turn it into a nice command description
@@ -136,11 +136,11 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
   }, 'Disconnect from the current server.');
 
   this.register(/^\/join (.*)/, function (channel) {
-    this.network.writeLine('JOIN ' + channel);
+    this.network.writeLine('JOIN %s', channel);
   }, 'Join a channel.');
 
   this.register(/^\/part/, function () {
-    this.network.writeLine('PART ' + this.channel.name + ' :');
+    this.network.writeLine('PART %s :', this.channel.name);
   }, 'Part the current channel.');
 
   this.register(/^\/quote (.*)/, function (line) {
@@ -159,7 +159,7 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
 app.service('ColorService', function () {
   var colors = '_white black blue green _red red purple yellow _yellow _green cyan _cyan _blue _purple _black'.split(' ');
   for (var i = 0; i < colors.length; i++) {
-    this[colors[i]] = "\003" + ('0' + i.toString()).substr(-2);
+    this[colors[i]] = "\003" + _.str.sprintf('%02f', i);
   }
   this.white = this.reset = "\x0f";
 });
