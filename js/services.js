@@ -148,4 +148,5 @@ app.service('ColorService', function () {
   for (var i = 0; i < colors.length; i++) {
     this[colors[i]] = "\003" + ('0' + i.toString()).substr(-2);
   }
+  this.white = this.reset = "\x0f";
 });

@@ -1,6 +1,6 @@
 var app = angular.module('IdelApp', []);
 
-app.controller('IdelController', function ($scope, $http, PortService, SettingsService, IRCService, InputService, Nick, ColorService) {
+app.controller('IdelController', function ($scope, $http, PortService, SettingsService, IRCService, InputService, ColorService) {
   $scope.settings = SettingsService;
   $scope.irc = IRCService;
   $scope.port = PortService;
@@ -18,8 +18,11 @@ app.controller('IdelController', function ($scope, $http, PortService, SettingsS
       less.modifyVars(theme);
     });
   });
-  
-  $scope.test = 'hello';
 
-  $scope.irc.getStatusChannel().addLine(null, 'connect', 3); // Show connect widget
+  $scope.irc.getStatusChannel().addLine(null, 'Welcome to ' +
+                                        ColorService._white + 'idel'
+                                        + ' IRC' +
+                                        ColorService.reset + ', type ' +
+                                        ColorService.green + '/help' +
+                                        ColorService.reset + ' to begin.', 1);
 });
