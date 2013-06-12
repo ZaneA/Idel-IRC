@@ -84,6 +84,7 @@ a {
 
 ::-webkit-scrollbar-track-piece { display: none; }
 ::-webkit-scrollbar-button { display: none; }
+::-webkit-scrollbar-corner { display: none; }
 
 ::-webkit-scrollbar-thumb {
   background: rgba(30, 30, 30, 0);
@@ -119,6 +120,10 @@ a {
     &::-webkit-scrollbar-thumb {
       background: #111;
       border: 1px solid #000;
+    }
+    &::-webkit-scrollbar-corner {
+      display: block;
+      background: #000;
     }
   }
 }
