@@ -97,7 +97,7 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
   
   network.prototype.writeLine = function () {
     var line = _.str.sprintf.apply(this, arguments);
-    this.channels[0].addLine(null, ColorService.black + '> ' + line, 1);
+    this.channels[0].addLine(1, null, '%s> %s', ColorService.black, line);
     this._socket.writeLine(line);
   };
 
@@ -107,7 +107,7 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
   };
   
   network.prototype.onMessage = function (line) {
-    this.channels[0].addLine(null, ColorService.black + '< ' + line, 1);
+    this.channels[0].addLine(1, null, '%s< %s', ColorService.black, line);
 
     for (var i = 0; i < network.prototype._handlers.length; i++) {
       var match = line.match(network.prototype._handlers[i].regex);
@@ -182,13 +182,13 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
       if (nick == this.nick.name) { // It's us!
         // Add ourselves to this new channel
         var channel = Channel(channelName);
-        channel.addLine(null, ColorService.green + 'Joined ' + channelName + '.', 1);
+        channel.addLine(1, null, '%sJoined %s', ColorService.green, channelName);
         this.channels.push(channel);
       } else {
         // Add nick to the channel
         var channel = this.findChannel(channelName);
         channel.nicks.push(Nick(nick));
-        channel.addLine(null, ColorService.green + nick + ' joins', 1);
+        channel.addLine(1, null, '%s%s joins', ColorService.green, nick);
       }
   });
   
@@ -199,7 +199,7 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
       for (var i = 0; i < this.channels.length; i++) {
         this.channels[i].nicks = _.reject(this.channels[i].nicks, function (_nick) {
           if (_nick.name == nick) {
-            this.channels[i].addLine(null, ColorService.red + _nick.name + ' quits', 1);
+            this.channels[i].addLine(1, null, '%s%s quits', ColorService.red, _nick.name);
             return true;
           }
           
@@ -214,15 +214,14 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
     function (nick, channelName) {
       if (nick == this.nick.name) { // It's us!
         // Remove ourselves from this channel
-        this.channels = _.reject(this.channels, { name: channelName });
+        var channel = this.findChannel(channelName);
+        channel.nicks = [];
+        channel.addLine(1, null, '%sYou have left the channel', ColorService.yellow);
       } else {
         // Remove nick from the channel
-        console.log(channelName);
         var channel = this.findChannel(channelName);
-        console.log(this.channels);
-        console.log(channel);
         channel.nicks = _.reject(channel.nicks, Nick(nick));
-        channel.addLine(null, ColorService.yellow + nick + ' leaves', 1);
+        channel.addLine(1, null, '%s%s leaves', ColorService.yellow, nick);
       }
   });
   
@@ -240,7 +239,7 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
       var channel = this.findChannel(channelName);
       if (channel) {
         var nick = _.find(channel.nicks, { name: nick });
-        channel.addLine(nick, message);
+        channel.addLine(0, nick, '%s', message);
       }
   });
   
@@ -258,10 +257,9 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
         if (this.nick.name == oldnick)
           this.nick.name = newnick;
 
-        channel.addLine(null, ColorService._white + oldnick +
-                        ColorService.reset + ' is now'
-                        + ' known as ' + ColorService._white +
-                        newnick, 1);
+        channel.addLine(1, null, '%s%s%s is now known as %s%s',
+                        ColorService._white, oldnick, ColorService.reset,
+                        ColorService._white, newnick);
       }, this);
   });
 
@@ -281,10 +279,6 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
           
           case 'MODE':
             break;
-          
-          //case 'QUIT': // No channel given, need to enumerate, look for nick, remove nick from all :(
-          case 'PART':
-            break;
         }
         break;
 
@@ -293,7 +287,7 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
   
   network.prototype.onDisconnect = function () {
     _.each(this.channels, function (channel) {
-      channel.addLine(null, ColorService._red + 'Disconnected.', 1);
+      channel.addLine(1, null, '%sDisconnected.', ColorService._red);
     });
 
     // TODO Reconnect logic
@@ -312,10 +306,15 @@ app.factory('Channel', function (Message) {
       topic: null,
       nicks: [],
       buffer: [],
-      addLine: function (nick, message, type, timestamp) {
+      addLine: function () {
+        var args = _.toArray(arguments);
+        var type = args.shift();
+        var nick = args.shift();
+        var message = _.str.sprintf.apply(this, args);
+
         var lines = message.split("\n");
         for (var i = 0; i < lines.length; i++) {
-          this.buffer.push(Message(timestamp || moment().unix(), nick, lines[i], type || 0));
+          this.buffer.push(Message(moment().unix(), nick, lines[i], type));
         }
         this.activity = true;
       }

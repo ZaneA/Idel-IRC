@@ -114,8 +114,8 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
   this.register(/^\/help/, function () {
     for (var i = 0; i < self._handlers.length; i++) {
       var description = regex2description(self._handlers[i].regex.toString(), self._handlers[i].handler.toString());
-      this.statusChannel.addLine(null, ColorService._white + description, 1);
-      this.statusChannel.addLine(null, ColorService.black + '    ' + self._handlers[i].desc, 1);
+      this.statusChannel.addLine(1, null, '%s%s', ColorService._white, description);
+      this.statusChannel.addLine(1, null, '%s    %s', ColorService.black, self._handlers[i].desc);
     }
   }, 'Display a list of commands.');
 
@@ -164,7 +164,7 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
     _.each(_.filter(this.channel.buffer, function (line) {
       return _.str.include(line.message, term);
     }), function (message) {
-      this.channel.addLine(null, ColorService._red + (message.nick ? message.nick : 'status') + ': ' + message.message, 1);
+      this.channel.addLine(1, null, '%s%s: %s', ColorService._red, (message.nick ? message.nick : 'status'), message.message);
     }, this);
   }, 'Search the current buffer for term.');
   
