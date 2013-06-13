@@ -175,8 +175,8 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
     this.network.writeLine('JOIN %s', channel);
   }, 'Join a channel.');
 
-  this.register('part', function () {
-    this.network.writeLine('PART %s :', this.channel.name);
+  this.register('part', function (_channel) {
+    this.network.writeLine('PART %s :', channel || this.channel.name);
   }, 'Part the current channel.');
 
   this.register('quote', function (line) {
