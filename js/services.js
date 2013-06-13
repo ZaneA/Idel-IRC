@@ -26,12 +26,13 @@ app.service('IRCService', function (Network, LineSocket) {
   };
   
   this.setCurrentChannel = function (network, channel) {
+    var previousChannel = this.getChannel(this.current.network, this.current.channel);
+    previousChannel.activity = previousChannel.buffer.length;
+
     this.current.network = network;
     this.current.channel = channel;
     
     var current = this.currentChannel();
-    
-    current.activity = false;
     
     return current;
   };

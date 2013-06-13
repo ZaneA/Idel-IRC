@@ -8,9 +8,9 @@
 
   <network-list for="irc.networks" class="flex-0 horizontal"></network-list>
 
-  <chat-window for="irc.currentChannel().buffer" class="flex-1"></chat-window>
+  <chat-window for="irc.currentChannel()" class="flex-1"></chat-window>
 
-  <nick-list for="irc.currentChannel().nicks" class="flex-0 horizontal"></nick-list>
+  <nick-list for="irc.currentChannel()" class="flex-0 horizontal"></nick-list>
 
   <input-box for="irc.current" class="flex-0"></input-box>
 </vbox>

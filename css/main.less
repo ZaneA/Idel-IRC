@@ -6,7 +6,7 @@
 @color-logo: @color-text;
 @color-borders: #161616;
 @color-input: #0c0c0c;
-@color-topic: #aaa;
+@color-topic: @color-text;
 @color-chat-text: @color-text;
 @color-input-text: @color-text;
 @color-input-edge: #222;
@@ -188,6 +188,14 @@ button {
   }
 }
 
+hr {
+  margin: 10px 0;
+  width: 100%;
+  height: 1px;
+  border: none;
+  background: @color-borders;
+}
+
 // Components
 
 header {
@@ -211,7 +219,6 @@ header {
     text-align: right;
     color: @color-topic;
     font-size: 0.8em;
-    font-weight: bold;
     width: 100%;
     padding: 0 130px;
     overflow: hidden;
@@ -267,7 +274,6 @@ chat-window {
     
     .nick {
       position: absolute;
-      top: 0;
       left: 0;
       width: 160px;
       line-height: 1.8em;
@@ -281,7 +287,6 @@ chat-window {
     
     .timestamp {
       position: absolute;
-      top: 0;
       left: 0;
       width: 160px;
       text-align: left;

@@ -19,16 +19,13 @@ app.directive('channelList', function (IRCService) {
     scope: {
       channels: '=for'
     },
-    controller: function ($rootScope, $scope) {
+    controller: function ($scope) {
       $scope.networkName = $scope.$parent.network.name;
       $scope.current = IRCService.current;
 
       // Select a new channel
       $scope.select = function (name) {
-        $rootScope.$broadcast('ui::channel-list::select', {
-          channel: name,
-          network: $scope.$parent.network.name
-        });
+        IRCService.setCurrentChannel($scope.$parent.network.name, name);
       };
     }
   };
@@ -39,11 +36,11 @@ app.directive('chatWindow', function () {
     templateUrl: 'js/templates/chatWindow.html',
     restrict: 'E',
     scope: {
-      buffer: '=for'
+      channel: '=for'
     },
     controller: function ($scope, $element, $timeout) {
       // Scroll to bottom.
-      $scope.$watch('buffer', function () {
+      $scope.$watch('channel', function () {
         $timeout(function () {
           $element.prop('scrollTop', $element.prop('scrollHeight'));
         },0);
@@ -59,7 +56,7 @@ app.directive('nickList', function () {
     templateUrl: 'js/templates/nickList.html',
     restrict: 'E',
     scope: {
-      nicks: '=for'
+      channel: '=for'
     },
     controller: function ($rootScope, $scope) {
       // Select a nick

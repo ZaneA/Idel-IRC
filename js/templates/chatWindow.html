@@ -1,6 +1,7 @@
 <ul>
-  <li data-ng-repeat="line in buffer">
-    <span data-ng-show="line.type==0" class="timestamp" data-ng-bind="line.timestamp | timestamp"></span>
+  <li data-ng-repeat="line in channel.buffer">
+    <hr data-ng-show="$index == channel.activity" />
+    <span data-ng-show="line.type == 0" class="timestamp" data-ng-bind="line.timestamp | timestamp"></span>
     <ng-switch on="line.type">
       <span data-ng-switch-when="0" class="nick type-0" data-ng-bind="line.nick | nickify" data-colorize="line.nick.name"></span>
       <span data-ng-switch-when="1" class="nick type-1">-</span>

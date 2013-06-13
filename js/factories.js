@@ -325,7 +325,7 @@ app.factory('Channel', function () {
   return function (name) {
     return {
       name: name,
-      activity: false,
+      activity: 0,
       topic: null,
       nicks: [],
       buffer: [],
@@ -344,7 +344,6 @@ app.factory('Channel', function () {
             message: lines[i]
           });
         }
-        this.activity = true;
       }
     };
   };
