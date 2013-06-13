@@ -248,6 +248,11 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
   this.register('topic', function (topic) {
     this.network.writeLine('TOPIC %s :%s', this.channel.name, _.toArray(arguments).join(' '));
   }, 'Change the topic.');
+  
+  this.register('msg', function (nick, message) {
+    var args = _.toArray(arguments);
+    this.network.writeLine('PRIVMSG %s :%s', args.shift(), args.join(' '));
+  }, 'Send a message to nick.');
 });
 
 app.service('ColorService', function () {
