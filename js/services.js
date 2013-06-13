@@ -104,7 +104,6 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
   function commandHelp(command) {
     var desc = '/' + command.command;
     var args = _.filter(command.handler.toString().match(/function \((.*?)\)/)[1].split(','), 'length');
-    console.log(args);
     
     while (args.length > 0) {
       var arg = _.str.trim(args.shift());
