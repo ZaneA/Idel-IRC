@@ -6,7 +6,7 @@
 @color-logo: @color-text;
 @color-borders: #161616;
 @color-input: #0c0c0c;
-@color-topic: @color-text;
+@color-topic: #888;
 @color-chat-text: @color-text;
 @color-input-text: @color-text;
 @color-input-edge: #222;
@@ -212,7 +212,12 @@ header {
     color: @color-topic;
     font-size: 0.8em;
     font-weight: bold;
-    margin-right: 100px;
+    width: 100%;
+    padding: 0 130px;
+    overflow: hidden;
+    position: absolute;
+    left: 0;
+    top: 0;
   }
   
   .button-minimize {
@@ -251,7 +256,7 @@ chat-window {
   position: relative;
   
   background-image: @color-chat-separator;
-  background-position: 160px 0;
+  background-position: 170px 0;
   background-repeat: repeat-y;
   
   li {
@@ -264,10 +269,13 @@ chat-window {
       position: absolute;
       top: 0;
       left: 0;
-      width: 150px;
+      width: 160px;
+      line-height: 1.8em;
+      font-weight: bold;
       text-align: right;
       display: inline;
       overflow: hidden;
+      font-size: 0.9em;
       padding: 0;
     }
     
@@ -275,16 +283,16 @@ chat-window {
       position: absolute;
       top: 0;
       left: 0;
-      width: 150px;
+      width: 160px;
       text-align: left;
       color: #444;
-      padding: 0 15px;
+      padding: 0 10px;
       line-height: 1.9em;
       font-size: 0.8em;
       font-weight: bold;
       background-image: -webkit-gradient(linear, left top, right top,
                                          color-stop(0%, @color-background),
-                                         color-stop(40%, @color-background),
+                                         color-stop(30%, @color-background),
                                          color-stop(70%, fade(@color-background, 0%)));
       z-index: 99;
       
@@ -309,15 +317,14 @@ chat-window {
     p {
       color: @color-chat-text;
 
-      font-family: @font-mono;
+      font-family: @font-sans;
       font-size: 0.9em;
       line-height: 1.8em;
 
       margin: 0;
-      margin-left: 175px;
+      margin-left: 185px;
       
       a {
-        font-size: 0.9em;
         font-weight: bold;
         color: @color-link;
         text-decoration: none;

@@ -19,7 +19,7 @@ app.controller('IdelController', function ($scope, $http, PortService, SettingsS
     });
   });
 
-  $scope.irc.getStatusChannel().addLine(1, null, 'Welcome to %sidel IRC%s, type %s/help%s to begin.',
-                                        ColorService._white, ColorService.reset,
-                                        ColorService.green, ColorService.reset);
+  $scope.irc.getStatusChannel().topic = _.str.sprintf('Welcome to %sidel IRC%s, type %s/help%s to begin.',
+                                                      ColorService._white, ColorService.reset,
+                                                      ColorService.green, ColorService.reset);
 });
