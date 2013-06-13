@@ -369,22 +369,32 @@ channel-list {
 
     -webkit-transition: background ease-in-out 0.1s, color ease-in-out 0.1s;
 
-    &:nth-child(1) { color: @color-channel-1; &.selected, &:hover { background: @color-channel-1; color: contrast(@color-channel-1); }}
-    &:nth-child(2) { color: @color-channel-2; &.selected, &:hover { background: @color-channel-2; color: contrast(@color-channel-2); }}
-    &:nth-child(3) { color: @color-channel-3; &.selected, &:hover { background: @color-channel-3; color: contrast(@color-channel-3); }}
-    &:nth-child(4) { color: @color-channel-4; &.selected, &:hover { background: @color-channel-4; color: contrast(@color-channel-4); }}
-    &:nth-child(5) { color: @color-channel-5; &.selected, &:hover { background: @color-channel-5; color: contrast(@color-channel-5); }}
-    &:nth-child(6) { color: @color-channel-6; &.selected, &:hover { background: @color-channel-6; color: contrast(@color-channel-6); }}
+    &:nth-child(1) { color: desaturate(@color-channel-1, 50%); &.notifyStatus, &.notifyMessage { color: @color-channel-1; } &.selected, &.notifyHighlight, &:hover { background: @color-channel-1; color: contrast(@color-channel-1); }}
+    &:nth-child(2) { color: desaturate(@color-channel-2, 50%); &.notifyStatus, &.notifyMessage { color: @color-channel-2; } &.selected, &.notifyHighlight, &:hover { background: @color-channel-2; color: contrast(@color-channel-2); }}
+    &:nth-child(3) { color: desaturate(@color-channel-3, 50%); &.notifyStatus, &.notifyMessage { color: @color-channel-3; } &.selected, &.notifyHighlight, &:hover { background: @color-channel-3; color: contrast(@color-channel-3); }}
+    &:nth-child(4) { color: desaturate(@color-channel-4, 50%); &.notifyStatus, &.notifyMessage { color: @color-channel-4; } &.selected, &.notifyHighlight, &:hover { background: @color-channel-4; color: contrast(@color-channel-4); }}
+    &:nth-child(5) { color: desaturate(@color-channel-5, 50%); &.notifyStatus, &.notifyMessage { color: @color-channel-5; } &.selected, &.notifyHighlight, &:hover { background: @color-channel-5; color: contrast(@color-channel-5); }}
+    &:nth-child(6) { color: desaturate(@color-channel-6, 50%); &.notifyStatus, &.notifyMessage { color: @color-channel-6; } &.selected, &.notifyHighlight, &:hover { background: @color-channel-6; color: contrast(@color-channel-6); }}
     
     cursor: pointer;
     
   }
   
-  .active {
+  .selected {
     font-weight: bold;
+    background: #fff !important;
+    color: #000 !important;
   }
   
-  .selected {
+  .notifyStatus {
+    font-style: italic;
+  }
+
+  .notifyMessage {
+    font-weight: bold;
+  }
+
+  .notifyHighlight {
     font-weight: bold;
   }
 }

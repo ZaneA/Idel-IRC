@@ -22,6 +22,9 @@ app.directive('channelList', function (IRCService) {
     controller: function ($scope) {
       $scope.networkName = $scope.$parent.network.name;
       $scope.current = IRCService.current;
+      $scope.selected = function (channel) {
+        return $scope.current.network == $scope.networkName && $scope.current.channel == channel.name;
+      };
 
       // Select a new channel
       $scope.select = function (name) {

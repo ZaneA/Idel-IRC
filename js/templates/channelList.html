@@ -1,3 +1,3 @@
 <ul>
-  <li data-ng-repeat="channel in channels | orderBy:'name'" data-ng-bind="channel.name" data-ng-class="{ active: channel.activity != channel.buffer.length, selected: current.network == networkName && current.channel == channel.name }" data-ng-click="select(channel.name)"></li>
+  <li data-ng-repeat="channel in channels | orderBy:'name'" data-ng-bind="channel.name" data-ng-class="{ notifyStatus: !selected(channel) && channel.notifyType == 1, notifyMessage: !selected(channel) && channel.notifyType == 2, notifyHighlight: !selected(channel) && channel.notifyType == 3, selected: selected(channel) }" data-ng-click="select(channel.name)"></li>
 </ul>
