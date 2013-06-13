@@ -180,7 +180,7 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
   }, 'Part the current channel.');
 
   this.register('quote', function (line) {
-    this.network.writeLine(line);
+    this.network.writeLine(_.toArray(arguments).join(' '));
   }, 'Send a raw string to the server.');
 
   this.register('layout', function (layout) {
@@ -206,6 +206,10 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
   this.register('nick', function (nick) {
     this.network.writeLine('NICK %s', nick);
   }, 'Change your nickname.');
+  
+  this.register('topic', function (topic) {
+    this.network.writeLine('TOPIC %s :%s', this.channel.name, _.toArray(arguments).join(' '));
+  }, 'Change the topic.');
 });
 
 app.service('ColorService', function () {
