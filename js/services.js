@@ -118,6 +118,45 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
     return desc;
   }
   
+  this.jumpChannel = function (pos, relative) {
+    var list = [];
+    
+    for (var x = 0; x < IRCService.networks.length; x++) {
+      for (var y = 0; y < IRCService.networks[x].channels.length; y++) {
+        list.push({ network: IRCService.networks[x].name, channel: IRCService.networks[x].channels[y].name });
+      }
+    }
+    
+    list = _.sortBy(list, function (obj) {
+      return obj.network + obj.channel;
+    });
+    
+    for (var i = 0; i < list.length; i++) {
+      if (relative) {
+        if (IRCService.current.network == list[i].network &&
+            IRCService.current.channel == list[i].channel) {
+          var offset = i + pos;
+          if (offset < 0) offset = list.length - 1;
+          if (offset >= list.length) offset = 0;
+
+          IRCService.setCurrentChannel(list[offset].network, list[offset].channel);
+          $rootScope.$apply();
+
+          break;
+        }
+
+        continue;
+      }
+
+      if (i == pos) {
+        IRCService.setCurrentChannel(list[i].network, list[i].channel);
+        $rootScope.$apply();
+
+        break;
+      }
+    }
+  };
+  
   this.autocomplete = function (line) {
     // Autocomplete help commands
     for (var i = 0; i < this._handlers.length; i++) {

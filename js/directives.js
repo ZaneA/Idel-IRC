@@ -90,10 +90,30 @@ app.directive('inputBox', function (InputService) {
       };
 
       $element.children()[0].onkeydown = function (ev) {
+        if (ev.ctrlKey && ev.keyCode == 9) {
+          if (ev.shiftKey) {
+            InputService.jumpChannel(-1, true); // Relative
+          } else {
+            InputService.jumpChannel(+1, true); // Relative
+          }
+
+          return;
+        }
+        
+        if (ev.altKey && ev.keyCode >= 48 && ev.keyCode <= 57) {
+          var code = ev.keyCode;
+          if (code == 48) code = 58;
+          InputService.jumpChannel(ev.keyCode - 49);
+
+          return;
+        }
+
         if (ev.keyCode == 9 && $scope.input.length > 0) { // Tab
           $scope.$apply(function () {
             $scope.input = InputService.autocomplete($scope.input);
           });
+          
+          return;
         }
 
         if (ev.keyCode == 13 && $scope.input.length > 0) { // Enter
@@ -105,6 +125,8 @@ app.directive('inputBox', function (InputService) {
             $scope.history.unshift($scope.input);
             $scope.input = '';
           });
+
+          return;
         }
         
         if (ev.keyCode == 38) { // Up
@@ -113,6 +135,8 @@ app.directive('inputBox', function (InputService) {
             if ($scope.input)
               $scope.history.push($scope.input);
           });
+
+          return;
         }
 
         if (ev.keyCode == 40) { // Down
@@ -121,6 +145,8 @@ app.directive('inputBox', function (InputService) {
             if ($scope.input)
               $scope.history.unshift($scope.input);
           });
+
+          return;
         }
       };
     }
