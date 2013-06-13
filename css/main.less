@@ -151,6 +151,16 @@ hbox {
 .flex-0 { -webkit-flex: 0; }
 .flex-1 { -webkit-flex: 1; }
 .flex-2 { -webkit-flex: 2; }
+      
+a {
+  font-weight: bold;
+  color: @color-link;
+  text-decoration: none;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+}
 
 h1, h2, h3, h4, h5, h6 {
   margin: 0;
@@ -328,16 +338,6 @@ chat-window {
 
       margin: 0;
       margin-left: 185px;
-      
-      a {
-        font-weight: bold;
-        color: @color-link;
-        text-decoration: none;
-        
-        &:hover {
-          text-decoration: underline;
-        }
-      }
     }
   }
 }
