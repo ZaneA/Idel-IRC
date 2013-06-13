@@ -137,14 +137,32 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
     'RFC1459::332::RPL_TOPIC',
     /^:.*? 332 .*? (.*?) :(.*)$/,
     function (channelName, topic) {
-      this.findChannel(channelName).topic = topic;
+      var channel = this.findChannel(channelName);
+      channel.addLine(1, null, '%sTopic changed from %s%s%s to %s%s%s',
+                      ColorService.yellow,
+                      ColorService.reset,
+                      channel.topic || 'none',
+                      ColorService.yellow,
+                      ColorService.reset,
+                      topic,
+                      ColorService.yellow);
+      channel.topic = topic;
   });
 
   network.prototype.register(
     'RFC1459::TOPIC',
     /^:(.*?) TOPIC (.*?) :(.*)$/,
     function (user, channelName, topic) {
-      this.findChannel(channelName).topic = topic;
+      var channel = this.findChannel(channelName);
+      channel.addLine(1, null, '%sTopic changed from %s%s%s to %s%s%s',
+                      ColorService.yellow,
+                      ColorService.reset,
+                      channel.topic || 'none',
+                      ColorService.yellow,
+                      ColorService.reset,
+                      topic,
+                      ColorService.yellow);
+      channel.topic = topic;
   });
 
   network.prototype.register(
