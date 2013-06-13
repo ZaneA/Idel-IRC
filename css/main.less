@@ -263,11 +263,34 @@ chat-window {
     .nick {
       position: absolute;
       top: 0;
-      left: 55px;
-      width: 100px;
+      left: 0;
+      width: 150px;
       text-align: right;
       display: inline;
+      overflow: hidden;
       padding: 0;
+    }
+    
+    .timestamp {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 150px;
+      text-align: left;
+      color: #444;
+      padding: 0 15px;
+      line-height: 1.9em;
+      font-size: 0.8em;
+      font-weight: bold;
+      background-image: -webkit-gradient(linear, left top, right top,
+                                         color-stop(0%, @color-background),
+                                         color-stop(40%, @color-background),
+                                         color-stop(70%, fade(@color-background, 0%)));
+      z-index: 99;
+      
+      &:hover {
+        opacity: 0;
+      }
     }
     
     .type-0 {
@@ -276,23 +299,11 @@ chat-window {
     }
 
     .type-1 {
-      color: #888;
+      color: #765;
     }
 
     .type-2 {
-      color: #888;
-    }
-    
-    .timestamp {
-      position: absolute;
-      top: 0;
-      left: 0;
-      display: inline;
-      color: #444;
-      line-height: 1.9em;
-      font-size: 0.8em;
-      font-weight: bold;
-      margin-left: 12px;
+      color: #765;
     }
     
     p {

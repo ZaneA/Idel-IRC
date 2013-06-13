@@ -1,11 +1,10 @@
 <ul>
   <li data-ng-repeat="line in buffer">
-    <span class="timestamp" data-ng-bind="line.timestamp | timestamp"></span>
+    <span data-ng-show="line.type==0" class="timestamp" data-ng-bind="line.timestamp | timestamp"></span>
     <ng-switch on="line.type">
       <span data-ng-switch-when="0" class="nick type-0" data-ng-bind="line.nick | nickify" data-colorize="line.nick.name"></span>
       <span data-ng-switch-when="1" class="nick type-1">-</span>
       <span data-ng-switch-when="2" class="nick type-2">- <span data-ng-bind="line.nick | nickify" data-colorize="line.nick.name"></span></span>
-      <span data-ng-switch-when="3" class="nick type-3"></span>
     </ng-switch>
     <p data-ng-bind-html-unsafe="line.message | escape | irccolorize | linkify"></p>
   </li>
