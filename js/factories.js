@@ -69,7 +69,7 @@ app.factory('LineSocket', function () {
   };
 });
 
-app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, Nick) {
+app.factory('Network', function ($rootScope, PortService, ColorService, LineSocket, Channel, Nick) {
   function network () {
     this.channels = [Channel('Status')];
   }
@@ -263,6 +263,11 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
       if (channel) {
         var nick = _.find(channel.nicks, { name: nick });
         channel.addLine(0, nick, '%s', message);
+        
+        // Highlight notifications
+        if (_.str.include(message.toLowerCase(), this.nick.name.toLowerCase())) {
+          PortService.notify('(' + channel.name + ') ' + nick.name, message);
+        }
       }
   });
   
@@ -336,6 +341,7 @@ app.factory('Channel', function () {
         var message = _.str.sprintf.apply(this, args);
 
         var lines = message.split("\n");
+
         for (var i = 0; i < lines.length; i++) {
           this.buffer.push({
             type: type,

@@ -28,4 +28,18 @@ app.service('PortService', function () {
       chrome.storage.sync.remove(key, cb);
     }
   };
+  
+  this._notifyId = 0;
+  
+  this.notify = function (title, body) {
+    var icon = chrome.runtime.getURL('assets/icon-64.png');
+    var options = {
+      iconUrl: icon,
+      priority: 0,
+      type: 'simple',
+      title: title,
+      message: body
+    };
+    chrome.notifications.create('id' + this._notifyId++, options, function () {});
+  };
 });
