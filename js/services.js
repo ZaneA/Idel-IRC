@@ -147,8 +147,9 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
   this.register('help', function () {
     for (var i = 0; i < self._handlers.length; i++) {
       var description = commandHelp(self._handlers[i]);
-      this.statusChannel.addLine(1, null, '%s%s', ColorService._white, description);
-      this.statusChannel.addLine(1, null, '%s    %s', ColorService.black, self._handlers[i].desc);
+      var channel = IRCService.getStatusChannel(IRCService.current.network);
+      channel.addLine(1, null, '%s%s', ColorService._white, description);
+      channel.addLine(1, null, '%s    %s', ColorService.black, self._handlers[i].desc);
     }
   }, 'Display a list of commands.');
 
