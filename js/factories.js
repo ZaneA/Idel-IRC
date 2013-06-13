@@ -102,6 +102,10 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
   };
 
   network.prototype.onConnect = function () {
+    if (this.password) {
+      this.writeLine('PASS %s', this.password);
+    }
+
     this.writeLine('NICK %s', this.nick.name);
     this.writeLine('USER %s 0 * :%s', this.nick.name, this.nick.name);
   };
