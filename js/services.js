@@ -91,6 +91,9 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
           return;
         }
       }
+      
+      bindObject.network.writeLine('%s %s', _.str.ltrim(parts.shift(), '/').toUpperCase(), parts.join(' '));
+      return;
     }
     
     bindObject.network.writeLine('PRIVMSG %s :%s', bindObject.channel.name, line);
@@ -117,6 +120,7 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
   }
   
   this.autocomplete = function (line) {
+    // Autocomplete help commands
     for (var i = 0; i < this._handlers.length; i++) {
       var desc = commandHelp(this._handlers[i]);
       if (_.str.startsWith(desc, line)) {
@@ -124,6 +128,7 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
       }
     }
     
+    // Autocomplete nicks
     var channel = IRCService.currentChannel();
 
     for (var i = 0; i < channel.nicks.length; i++) {
@@ -147,9 +152,9 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
     }
   }, 'Display a list of commands.');
 
-  this.register('connect', function (name, server, _nick, _pass) {
+  this.register('connect', function (server, _name, _nick, _pass) {
     var network = Network({
-      name: name,
+      name: _name || server,
       servers: [server],
       nick: Nick(_nick || 'Idel'),
       password: _pass,

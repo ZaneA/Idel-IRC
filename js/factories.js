@@ -118,10 +118,11 @@ app.factory('Network', function ($rootScope, ColorService, LineSocket, Channel, 
       if (match) {
         match.shift();
         network.prototype._handlers[i].handler.apply(this, match);
-        $rootScope.$apply();
-        return;
+        break;
       }
     }
+
+    $rootScope.$apply();
   };
   
   // HELPERS
