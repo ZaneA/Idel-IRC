@@ -136,7 +136,7 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
     }
     
     list = _.sortBy(list, function (obj) {
-      return obj.network + obj.channel;
+      return obj.network + obj.channel.toLowerCase();
     });
     
     for (var i = 0; i < list.length; i++) {
@@ -222,7 +222,7 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
   }, 'Join a channel.');
 
   this.register('part', function (_channel) {
-    this.network.writeLine('PART %s :', channel || this.channel.name);
+    this.network.writeLine('PART %s :', _channel || this.channel.name);
   }, 'Part the current channel.');
 
   this.register('quote', function (line) {

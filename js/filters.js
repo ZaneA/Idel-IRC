@@ -51,3 +51,11 @@ app.filter('irccolorize', function () {
     return text + end.join('');
   };
 });
+
+app.filter('channelOrder', function () {
+  return function (list) {
+    return _.sortBy(list, function (channel) {
+      return channel.name.toLowerCase();
+    });
+  };
+});
