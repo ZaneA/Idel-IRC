@@ -69,7 +69,7 @@ app.factory('LineSocket', function () {
   };
 });
 
-app.factory('Network', function ($rootScope, PortService, ColorService, LineSocket, Channel, Nick) {
+app.factory('Network', function ($rootScope, PortService, ColorService, LineSocket, /*TLSLineSocket,*/ Channel, Nick) {
   function network () {
     this.channels = [Channel('Status')];
   }
@@ -82,6 +82,7 @@ app.factory('Network', function ($rootScope, PortService, ColorService, LineSock
   
   network.prototype.connect = function () {
     this._socket = LineSocket();
+    //this._socket = TLSLineSocket();
     
     // FIXME should cycle through available servers
     var server = this.servers[0];
