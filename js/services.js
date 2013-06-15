@@ -27,9 +27,12 @@ app.service('IRCService', function (Network, LineSocket) {
   
   this.setCurrentChannel = function (network, channel) {
     var previousChannel = this.getChannel(this.current.network, this.current.channel);
-    previousChannel.activity = previousChannel.buffer.length;
 
-    previousChannel.notifyType = 0;
+    if (previousChannel) {
+      previousChannel.activity = previousChannel.buffer.length;
+
+      previousChannel.notifyType = 0;
+    }
 
     this.current.network = network;
     this.current.channel = channel;

@@ -271,9 +271,11 @@ app.factory('Network', function ($rootScope, PortService, ColorService, LineSock
     /^:(.*?)!.*? (NOTICE|PRIVMSG) (.*?) :(.*)$/,
     function (nick, type, channelName, message) {
       var lineType = 0; // Regular PRIVMSG
+      var privateMsg = false;
       
       if (channelName == this.nick.name) { // HACK to make private messages work
         channelName = nick;
+        privateMsg = true;
       }
 
       if (message[0] == "\001") { // Handle CTCP
@@ -310,8 +312,12 @@ app.factory('Network', function ($rootScope, PortService, ColorService, LineSock
       }
 
       var channel = this.findOrCreateChannel(channelName);
+      
+      if (privateMsg) {
+        channel.nicks.push(Nick(nick));
+      }
 
-      nick = _.find(channel.nicks, { name: nick }) || Nick(nick); // Handle private message case
+      nick = _.find(channel.nicks, { name: nick });
 
       channel.addLine(lineType, nick, '%s', message);
 
@@ -331,6 +337,10 @@ app.factory('Network', function ($rootScope, PortService, ColorService, LineSock
     /^:(.*?)!.*? NICK :(.*)$/,
     function (oldnick, newnick) {
       _.each(this.channels, function (channel) {
+        if (channel.name == oldnick) { // Private messages
+          channel.name = newnick;
+        }
+
         var nick = _.find(channel.nicks, { name: oldnick });
 
         if (!nick) return;
