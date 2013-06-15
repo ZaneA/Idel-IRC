@@ -130,6 +130,17 @@ app.factory('Network', function ($rootScope, PortService, ColorService, LineSock
   network.prototype.findChannel = function (name) {
     return _.find(this.channels, { name: name });
   };
+
+  network.prototype.findOrCreateChannel = function (name) {
+    var channel = this.findChannel(name);
+
+    if (!channel) {
+      channel = Channel(name);
+      this.channels.push(channel);
+    }
+
+    return channel;
+  };
   
   // PROTOCOL HANDLING BELOW
   
@@ -259,20 +270,59 @@ app.factory('Network', function ($rootScope, PortService, ColorService, LineSock
     'RFC1459::NOTICE|RFC1459::PRIVMSG',
     /^:(.*?)!.*? (NOTICE|PRIVMSG) (.*?) :(.*)$/,
     function (nick, type, channelName, message) {
-      var channel = this.findChannel(channelName);
-      if (channel) {
-        var nick = _.find(channel.nicks, { name: nick });
-        channel.addLine(0, nick, '%s', message);
-        
-        if (channel.notifyType < 2)
-          channel.notifyType = 2;
-        
-        // Highlight notifications
-        if (_.str.include(message.toLowerCase(), this.nick.name.toLowerCase())) {
-          PortService.notify('(' + channel.name + ') ' + nick.name, message);
-          if (channel.notifyType < 3)
-            channel.notifyType = 3;
+      var lineType = 0; // Regular PRIVMSG
+      
+      if (channelName == this.nick.name) { // HACK to make private messages work
+        channelName = nick;
+      }
+
+      if (message[0] == "\001") { // Handle CTCP
+        var match = message.match(/\001(.*?)(\s.*)?\001/);
+
+        if (match) {
+          var body = _.str.ltrim(match[2]);
+
+          switch (match[1]) {
+          case 'ACTION':
+            lineType = 2; // Action
+            message = match[2];
+            break;
+
+          case 'VERSION':
+            if (type == 'PRIVMSG') {
+              this.writeLine('NOTICE %s :\001VERSION Idel IRC %s\001', nick, chrome.runtime.getManifest().version);
+            }
+            return;
+
+          case 'TIME':
+            if (type == 'PRIVMSG') {
+              this.writeLine('NOTICE %s :\001TIME :%s\001', nick, moment().format('dddd, MMMM Do YYYY, h:mm:ss a'));
+            }
+            return;
+
+          case 'PING':
+            if (type == 'PRIVMSG') {
+              this.writeLine('NOTICE %s :\001PING %s\001', nick, body);
+            }
+            return;
+          }
         }
+      }
+
+      var channel = this.findOrCreateChannel(channelName);
+
+      nick = _.find(channel.nicks, { name: nick }) || Nick(nick); // Handle private message case
+
+      channel.addLine(lineType, nick, '%s', message);
+
+      if (channel.notifyType < 2)
+        channel.notifyType = 2;
+
+      // Highlight notifications
+      if (_.str.include(message.toLowerCase(), this.nick.name.toLowerCase())) {
+        PortService.notify('(' + channel.name + ') ' + nick.name, message);
+        if (channel.notifyType < 3)
+          channel.notifyType = 3;
       }
   });
   

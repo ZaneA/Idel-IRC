@@ -258,6 +258,15 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
     var args = _.toArray(arguments);
     this.network.writeLine('PRIVMSG %s :%s', args.shift(), args.join(' '));
   }, 'Send a message to nick.');
+  
+  this.register('ctcp', function (nick, message) {
+    var args = _.toArray(arguments);
+    this.network.writeLine("PRIVMSG %s :\001%s\001", args.shift(), args.join(' '));
+  }, 'Send a CTCP message to nick.');
+  
+  this.register('me', function (message) {
+    this.network.writeLine("PRIVMSG %s :\001ACTION %s\001", this.channel.name, _.toArray(arguments).join(' '));
+  }, 'Send an action to the current channel.');
 });
 
 app.service('ColorService', function () {
