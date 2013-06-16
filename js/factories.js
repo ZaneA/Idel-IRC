@@ -178,14 +178,14 @@ app.factory('Network', function ($rootScope, PortService, ColorService, LineSock
     'RFC1459::PART',
     /^:(.*?)!.*? PART :?(.*?)(\s.*)?$/,
     function (nick, channelName) {
+      var channel = this.findChannel(channelName);
+
       if (nick == this.nick.name) { // It's us!
         // Remove ourselves from this channel
-        var channel = this.findChannel(channelName);
         channel.nicks = [];
         channel.addLine(1, null, '%sYou have left the channel', ColorService.yellow);
       } else {
         // Remove nick from the channel
-        var channel = this.findChannel(channelName);
         channel.nicks = _.reject(channel.nicks, Nick(nick));
         channel.addLine(1, null, '%s%s leaves', ColorService.yellow, nick);
       }
