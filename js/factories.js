@@ -208,7 +208,7 @@ app.factory('Network', function ($rootScope, PortService, ColorService, LineSock
     /^:.*? 353 .*? . (.*?) :(.*)$/,
     function (channelName, nicks) {
       var channel = this.findChannel(channelName);
-      var nicks = nicks.split(' ');
+      nicks = nicks.split(' ');
       for (var i = 0; i < nicks.length; i++) {
         var mode = '';
         if (nicks[i][0] == '@' || nicks[i][0] == '+') { // Op
@@ -240,14 +240,16 @@ app.factory('Network', function ($rootScope, PortService, ColorService, LineSock
     'RFC1459::JOIN',
     /^:(.*?)!.*? JOIN :?(.*)$/,
     function (nick, channelName) {
+      var channel = null;
+
       if (nick == this.nick.name) { // It's us!
         // Add ourselves to this new channel
-        var channel = Channel(channelName);
+        channel = Channel(channelName);
         channel.addLine(1, null, '%sJoined %s', ColorService.green, channelName);
         this.channels.push(channel);
       } else {
         // Add nick to the channel
-        var channel = this.findChannel(channelName);
+        channel = this.findChannel(channelName);
         channel.nicks.push(Nick(nick));
         channel.addLine(1, null, '%s%s joins', ColorService.green, nick);
       }
