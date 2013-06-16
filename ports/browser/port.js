@@ -31,4 +31,21 @@ app.service('PortService', function () {
     
     callback();
   };
+
+  this.notify = function (title, body) {
+    humane.timeout = 2500;
+    humane.timeoutAfterMove = 2500;
+    humane.waitForMove = true;
+    humane.log(_.str.sprintf('<strong>%s:</strong> %s', title, body));
+  };
+  
+  // Load Notifications
+  var notifyCss = document.createElement('link');
+  notifyCss.rel = 'stylesheet';
+  notifyCss.href = 'components/humane-js/themes/libnotify.css';
+  document.head.appendChild(notifyCss);
+
+  var notifyScript = document.createElement('script');
+  notifyScript.src = 'components/humane-js/humane.min.js';
+  document.body.appendChild(notifyScript);
 });
