@@ -17,11 +17,11 @@ app.service('IRCService', function (Network) {
   this.networks = [Network({ name: 'Idel' })];
   
   /**
-   * Get a network object by name.
+   * Find a network by name.
    *
    * @method networkByName
    * @param {String} name Name of the network
-   * @return {Object} Returns network object
+   * @return {Network} Network object
    * @example
    *     IRCService.networkByName('Idel');
    */
@@ -30,35 +30,35 @@ app.service('IRCService', function (Network) {
   };
   
   /**
-   * Get a channel object by name.
+   * Find a channel by name.
    *
    * @method channelByName
-   * @param {Object} network Network object
+   * @param {Network} network Network object
    * @param {String} name Name of the channel
-   * @return {Object} Returns channel object
+   * @return {Channel} Channel object
    */
   this.channelByName = function (network, name) {
     return network ? _.find(network.channels, { name: name }) : null;
   };
   
   /**
-   * Get a network object of the current network (selected by the
+   * Get the network object of the current network (selected by the
    * channel selector).
    *
    * @method currentNetwork
-   * @return {Object} Returns network object
+   * @return {Network} Network object
    */
   this.currentNetwork = function () {
     return this.networkByName(this.current.network);
   };
   
   /**
-   * Get a channel object by name.
+   * Find a channel by name.
    *
    * @method getChannel
    * @param {String} network Name of the network
    * @param {String} name Name of the channel
-   * @return {Object} Returns channel object
+   * @return {Channel} Channel object
    * @example
    *     IRCService.getChannel('Freenode', '#angularjs');
    */
@@ -67,11 +67,11 @@ app.service('IRCService', function (Network) {
   };
 
   /**
-   * Get a channel object of the current channel (selected by the
+   * Get the channel object of the current channel (selected by the
    * channel selector).
    *
    * @method currentChannel
-   * @return {Object} Returns channel object
+   * @return {Channel} Channel object
    */
   this.currentChannel = function () {
     return this.getChannel(this.current.network, this.current.channel);
@@ -83,7 +83,7 @@ app.service('IRCService', function (Network) {
    * @method setCurrentChannel
    * @param {String} network Name of the network
    * @param {String} channel Name of the channel
-   * @return {Object} Returns current channel object
+   * @return {Channel} New current channel object
    * @example
    *     IRCService.setCurrentChannel('Freenode', '#angularjs');
    */
@@ -111,7 +111,7 @@ app.service('IRCService', function (Network) {
    *
    * @method getStatusChannel
    * @param {String} network Name of the network
-   * @return {Object} Returns channel object for the "Status" channel
+   * @return {Channel} Channel object for the "Status" channel
    */
   this.getStatusChannel = function (network) {
     return this.getChannel(network || 'Idel', 'Status');
@@ -464,6 +464,16 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
   }, 'Send an action to the current channel.');
 });
 
+/**
+ * Color Service. This service contains a collection of colors and
+ * their corresponding IRC codes which can be added into any string
+ * that is entering the chat window.
+ *
+ * @class ColorService
+ * @constructor
+ * @example
+ *     ColorService.blue + 'hello ' + ColorService._yellow + 'world'
+*/
 app.service('ColorService', function () {
   var colors = '_white black blue green _red red purple yellow _yellow _green cyan _cyan _blue _purple _black'.split(' ');
   for (var i = 0; i < colors.length; i++) {

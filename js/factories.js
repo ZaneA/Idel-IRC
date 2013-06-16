@@ -1,16 +1,50 @@
 'use strict';
-
+  
+/**
+ * Network Factory. This factory is responsible for handling the
+ * connection to an IRC network and parsing the protocol.
+ *
+ * @class Network
+ * @constructor
+*/
 app.factory('Network', function ($rootScope, PortService, ColorService, LineSocket, /*TLSLineSocket,*/ Channel, Nick) {
   function network () {
     this.channels = [Channel('Status')];
   }
   
+
+  /**
+   * A list of registered protocol handlers.
+   *
+   * @property _handlers
+   * @type {Array}
+   */
   network.prototype._handlers = [];
 
+  /**
+   * Register a new handler for a piece of the IRC protocol.
+   *
+   * @method register
+   * @param {String} description Description of this handler
+   * @param {String} regex Regular expression describing the line to match
+   * @param {Function} handler The function that handles this regular expression
+   * @example
+   *     network.register(
+   *       'RFC1459::PING',
+   *       /^PING :(.*)$/,
+   *       function (reply) {
+   *         this.writeLine('PONG :%s', reply);
+   *     });
+   */
   network.prototype.register = function (desc, regex, handler) {
     network.prototype._handlers.push({ regex: regex, handler: handler, desc: desc });
   };
   
+  /**
+   * Begin connecting to the IRC network.
+   *
+   * @method connect
+   */
   network.prototype.connect = function () {
     this._socket = LineSocket();
     //this._socket = TLSLineSocket();
@@ -22,17 +56,39 @@ app.factory('Network', function ($rootScope, PortService, ColorService, LineSock
     this._socket.connect(parts[0], parts[1], this.onConnect.bind(this), this.onMessage.bind(this), this.onDisconnect.bind(this));
   };
   
-  network.prototype.disconnect = function () {
-    this.writeLine('QUIT :Bye');
+  /**
+   * Disconnect from the IRC network.
+   *
+   * @method disconnect
+   * @param {String} [message='Bye'] Quit message
+   */
+  network.prototype.disconnect = function (message) {
+    this.writeLine('QUIT :%s', message || 'Bye');
     this._socket.disconnect();
   };
   
+  /**
+   * Write a formatted line to the network connection. Uses sprintf
+   * from Underscore.string.
+   *
+   * @method writeLine
+   * @param {String} format Format string (int sprintf-like format)
+   * @param {Object} [objects]* Objects to be passed to _.str.sprintf
+   * @example
+   *     network.writeLine('NICK %s', 'newnick');
+   */
   network.prototype.writeLine = function () {
     var line = _.str.sprintf.apply(this, arguments);
     this.channels[0].addLine(1, null, '%s> %s', ColorService.black, line);
     this._socket.writeLine(line);
   };
 
+  /**
+   * Internal method that handles the onConnect event from the network
+   * socket.
+   *
+   * @method onConnect
+   */
   network.prototype.onConnect = function () {
     if (this.password) {
       this.writeLine('PASS %s', this.password);
@@ -42,6 +98,13 @@ app.factory('Network', function ($rootScope, PortService, ColorService, LineSock
     this.writeLine('USER %s 0 * :%s', this.nick.name, this.nick.name);
   };
   
+  /**
+   * Internal method that handles the onMessage event from the network
+   * socket.
+   *
+   * @method onMessage
+   * @param {String} line The incoming line to match against registered handlers
+   */
   network.prototype.onMessage = function (line) {
     this.channels[0].addLine(1, null, '%s< %s', ColorService.black, line);
 
@@ -57,12 +120,44 @@ app.factory('Network', function ($rootScope, PortService, ColorService, LineSock
     $rootScope.$apply();
   };
   
+  /**
+   * Internal method that handles the onDisconnect event from the network
+   * socket.
+   *
+   * @method onDisconnect
+   */
+  network.prototype.onDisconnect = function () {
+    _.each(this.channels, function (channel) {
+      channel.addLine(1, null, '%sDisconnected.', ColorService._red);
+    });
+
+    // TODO Reconnect logic
+  };
+
+  return function (obj) {
+    return _.assign(new network(), obj);
+  };
+  
   // HELPERS
 
+  /**
+   * Find a channel in this network by name.
+   *
+   * @method findChannel
+   * @param {String} name Name of the channel to find
+   * @return {Channel} The found channel, or null
+   */
   network.prototype.findChannel = function (name) {
     return _.find(this.channels, { name: name });
   };
 
+  /**
+   * Find a channel in this network by name, or create it.
+   *
+   * @method findOrCreateChannel
+   * @param {String} name Name of the channel to find
+   * @return {Channel} A channel object, either existing or new
+   */
   network.prototype.findOrCreateChannel = function (name) {
     var channel = this.findChannel(name);
 
@@ -309,20 +404,15 @@ app.factory('Network', function ($rootScope, PortService, ColorService, LineSock
 
       case 'ERROR':
      */
-  
-  network.prototype.onDisconnect = function () {
-    _.each(this.channels, function (channel) {
-      channel.addLine(1, null, '%sDisconnected.', ColorService._red);
-    });
-
-    // TODO Reconnect logic
-  };
-
-  return function (obj) {
-    return _.assign(new network(), obj);
-  };
 });
 
+/**
+ * Channel Factory. This factory contains a representation of a
+ * channel and contains all properties related to that.
+ *
+ * @class Channel
+ * @constructor
+*/
 app.factory('Channel', function () {
   return function (name) {
     return {
@@ -332,6 +422,15 @@ app.factory('Channel', function () {
       topic: null,
       nicks: [],
       buffer: [],
+      /**
+       * Add a line to this channel buffer.
+       *
+       * @method addLine
+       * @param {String} format Format string (int sprintf-like format)
+       * @param {Object} [objects]* Objects to be passed to _.str.sprintf
+       * @example
+       *     channel.addLine('%shello, %s%s', ColorService.white, ColorService._white, 'world');
+       */
       addLine: function () {
         var args = _.toArray(arguments);
         var type = args.shift();
@@ -356,6 +455,13 @@ app.factory('Channel', function () {
   };
 });
 
+/**
+ * Nick Factory. This is a small wrapper for an IRC nick to keep track
+ * of name and modes.
+ *
+ * @class Nick
+ * @constructor
+*/
 app.factory('Nick', function () {
   return function (name, mode) {
     return {
