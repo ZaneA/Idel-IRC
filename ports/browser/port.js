@@ -49,3 +49,53 @@ app.service('PortService', function () {
   notifyScript.src = 'components/humane-js/humane.min.js';
   document.body.appendChild(notifyScript);
 });
+
+app.factory('LineSocket', function () {
+  function lineSocket () {
+    this._lineBuffer = '';
+  };
+
+  lineSocket.prototype.connect = function (host, port, onConnect, onMessage, onDisconnect) {
+    var self = this;
+    
+    this._onConnect = onConnect;
+    this._onMessage = onMessage;
+    this._onDisconnect = onDisconnect;
+
+    this._socket = new WebSocket('ws://127.0.0.1:8080');
+
+    this._socket.onopen = function () {
+      self._onConnect();
+      self.readLoop();
+    };
+  };
+  
+  lineSocket.prototype.disconnect = function () {
+    this._socket.close();
+    this._onDisconnect();
+  };
+  
+  lineSocket.prototype.readLoop = function () {
+    var self = this;
+    
+    this._socket.onmessage = function (ev) {
+      self._lineBuffer += ev.data;
+      var parts = self._lineBuffer.split('\r\n');
+
+      for (var i = 0; i < parts.length - 1; i++) {
+        self._onMessage(parts[i]);
+      }
+      
+      self._lineBuffer = parts[parts.length-1];
+    };
+  };
+  
+  lineSocket.prototype.writeLine = function (line) {
+    line += '\r\n';
+    this._socket.send(line);
+  };
+
+  return function () {
+    return new lineSocket();
+  };
+});
