@@ -273,14 +273,14 @@ app.factory('Network', function ($rootScope, PortService, ColorService, LineSock
           channel.name = newnick;
         }
 
+        if (this.nick.name == oldnick)
+          this.nick.name = newnick;
+
         var nick = _.find(channel.nicks, { name: oldnick });
 
         if (!nick) return;
 
         nick.name = newnick;
-
-        if (this.nick.name == oldnick)
-          this.nick.name = newnick;
 
         channel.addLine(1, null, '%s%s%s is now known as %s%s',
                         ColorService._white, oldnick, ColorService.reset,
