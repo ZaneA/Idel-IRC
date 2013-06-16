@@ -1,28 +1,92 @@
 'use strict';
 
-app.service('IRCService', function (Network, LineSocket) {
+/**
+ * IRC Service. This service manages a collection of networks and
+ * channels and provides helper methods for managing them.
+ *
+ * @class IRCService
+ * @constructor
+*/
+app.service('IRCService', function (Network) {
+  /**
+   * A list of networks.
+   *
+   * @property networks
+   * @type {Array}
+   */
   this.networks = [Network({ name: 'Idel' })];
   
+  /**
+   * Get a network object by name.
+   *
+   * @method networkByName
+   * @param {String} name Name of the network
+   * @return {Object} Returns network object
+   * @example
+   *     IRCService.networkByName('Idel');
+   */
   this.networkByName = function (name) {
     return _.find(this.networks, { name: name });
   };
   
+  /**
+   * Get a channel object by name.
+   *
+   * @method channelByName
+   * @param {Object} network Network object
+   * @param {String} name Name of the channel
+   * @return {Object} Returns channel object
+   */
   this.channelByName = function (network, name) {
     return network ? _.find(network.channels, { name: name }) : null;
   };
   
+  /**
+   * Get a network object of the current network (selected by the
+   * channel selector).
+   *
+   * @method currentNetwork
+   * @return {Object} Returns network object
+   */
   this.currentNetwork = function () {
     return this.networkByName(this.current.network);
   };
   
+  /**
+   * Get a channel object by name.
+   *
+   * @method getChannel
+   * @param {String} network Name of the network
+   * @param {String} name Name of the channel
+   * @return {Object} Returns channel object
+   * @example
+   *     IRCService.getChannel('Freenode', '#angularjs');
+   */
   this.getChannel = function (network, channel) {
     return this.channelByName(this.networkByName(network), channel);
   };
 
+  /**
+   * Get a channel object of the current channel (selected by the
+   * channel selector).
+   *
+   * @method currentChannel
+   * @return {Object} Returns channel object
+   */
   this.currentChannel = function () {
     return this.getChannel(this.current.network, this.current.channel);
   };
   
+  /**
+   * Set the current channel.
+   *
+   * @method setCurrentChannel
+   * @param {String} network Name of the network
+   * @param {String} channel Name of the channel
+   * @return {Object} Returns current channel object
+   * @example
+   *     IRCService.setCurrentChannel('Freenode', '#angularjs');
+   */
   this.setCurrentChannel = function (network, channel) {
     var previousChannel = this.getChannel(this.current.network, this.current.channel);
 
@@ -42,20 +106,65 @@ app.service('IRCService', function (Network, LineSocket) {
     return current;
   };
   
+  /**
+   * Get the "Status" channel for a network.
+   *
+   * @method getStatusChannel
+   * @param {String} network Name of the network
+   * @return {Object} Returns channel object for the "Status" channel
+   */
   this.getStatusChannel = function (network) {
     return this.getChannel(network || 'Idel', 'Status');
   };
   
+  /**
+   * A map of the current network and channel names.
+   *
+   * @property current
+   * @type {Object}
+   */
   this.current = {
     network: 'Idel',
     channel: 'Status'
   };
 });
 
+/**
+ * Nick Coloring Service. This service manages the handing out of
+ * unique nick colors.
+ *
+ * @class NickColor
+ * @constructor
+*/
 app.service('NickColor', function () {
+  /**
+   * The number of usable colors defined in the CSS.
+   *
+   * @property colors
+   * @type {Integer}
+   */
   this.colors = 6;
+
+  /**
+   * The current index.
+   *
+   * @property current
+   * @type {Integer}
+   */
   this.current = 0;
 
+  /**
+   * Get the unique color index for a particular nick.
+   *
+   * @method get
+   * @param {String} nick Name of the nick
+   * @return {Integer} Returns an index of the color to use
+   * @example
+   *     NickColor.get('user1'); => 0
+   *     NickColor.get('user2'); => 1
+   *     NickColor.get('user3'); => 2
+   *     NickColor.get('user1'); => 0
+   */
   this.get = _.memoize(function (nick) {
     var colorIndex = this.current;
 
@@ -67,20 +176,79 @@ app.service('NickColor', function () {
   });
 });
 
-// User settings
+/**
+ * Settings Service. This service manages a collection of settings and
+ * provides suitable helper methods for retrieval and storage.
+ *
+ * @class SettingsService
+ * @constructor
+*/
 app.service('SettingsService', function () {
+  /**
+   * The path to the active layout.
+   *
+   * @property layout
+   * @type {String}
+   * @default "layouts/horizontal.html"
+   */
   this.layout = 'layouts/horizontal.html';
+
+  /**
+   * The path to the active theme.
+   *
+   * @property theme
+   * @type {String}
+   * @default "themes/dark.json"
+   */
   this.theme = 'themes/dark.json';
 });
 
+/**
+ * Input Service. This service handles parsing and actions for the
+ * input box.
+ *
+ * @class InputService
+ * @constructor
+*/
 app.service('InputService', function ($rootScope, IRCService, SettingsService, ColorService, Network, Nick) {
+  /**
+   * A list of registered handlers.
+   *
+   * @property _handlers
+   * @type {Array}
+   * @default []
+   */
   this._handlers = [];
 
+  /**
+   * Register a new command handler.
+   *
+   * @method register
+   * @param {String} command Name of the command
+   * @param {Function} handler A function that handles the command
+   * @param {String} description Description of the command
+   * @example
+   *     InputService.register('hello', function (name) {
+   *       console.log('Hello, ' + name + '!');
+   *     }, 'Say hello on the browser console.');
+   *
+   *     // Now you may use "/hello World" in the input box
+   */
   this.register = function (command, handler, desc) {
     this._handlers.push({ command: command, handler: handler, desc: desc });
     this._handlers = _.sortBy(this._handlers, 'command');
   };
 
+  /**
+   * Parse a line from the input box using the registered handlers.
+   *
+   * @method parse
+   * @param {String} line The line to parse
+   * @example
+   *     InputService.parse('/hello World');
+   *
+   *     // You should see "Hello, World!" printed to the browser console
+   */
   this.parse = function (line) {
     var bindObject = {
       network: IRCService.currentNetwork(),
@@ -106,7 +274,13 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
     bindObject.channel.addLine(0, bindObject.network.nick, line);
   };
   
-  // Bit of a hack to take a registered handler (command + callback) and turn it into a nice command description
+  /**
+   * A hack to retrieve the command arguments to be used in help text.
+   *
+   * @method commandHelp
+   * @param {Object} command Command object
+   * @return {String} A list of arguments
+   */
   function commandHelp(command) {
     var desc = '/' + command.command;
     var args = _.filter(command.handler.toString().match(/function \((.*?)\)/)[1].split(','), 'length');
@@ -124,6 +298,15 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
     return desc;
   }
   
+  /**
+   * Jump to another channel.
+   *
+   * @method jumpChannel
+   * @param {Integer} position Index of channel to jump to, or relative offset
+   * @param {Boolean} relative Whether or not the position is relative
+   * @example
+   *     InputService.jumpChannel(0, false);
+   */
   this.jumpChannel = function (pos, relative) {
     var list = [];
     
@@ -163,6 +346,17 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
     }
   };
   
+  /**
+   * Get the autocompletion of a line of text. Completes commands and
+   * channel nicks.
+   *
+   * @method autocomplete
+   * @param {String} line The current line to autocomplete
+   * @return {String} A new line after autocompletion
+   * @example
+   *     InputService.autocomplete('zan'); => 'zanea, '
+   *     InputService.autocomplete('/con'); => '/connect '
+   */
   this.autocomplete = function (line) {
     // Autocomplete help commands
     for (var i = 0; i < this._handlers.length; i++) {
