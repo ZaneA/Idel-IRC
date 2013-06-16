@@ -1,3 +1,5 @@
+'use strict';
+
 app.filter('escape', function () {
   return function (text) {
     if (!text) return '';

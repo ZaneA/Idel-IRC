@@ -1,3 +1,5 @@
+'use strict';
+
 // TLS support using https://github.com/digitalbazaar/forge
 // Currently errors out with "Incompatible TLS Version"
 app.factory('TLSLineSocket', function (LineSocket) {

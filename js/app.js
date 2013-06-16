@@ -1,3 +1,5 @@
+'use strict';
+
 var app = angular.module('IdelApp', []);
 
 app.controller('IdelController', function ($scope, $http, PortService, SettingsService, IRCService, InputService, ColorService) {

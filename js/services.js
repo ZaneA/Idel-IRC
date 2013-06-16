@@ -1,9 +1,7 @@
-app.service('IRCService', function (Network, LineSocket) {
-  this.networks = [];
+'use strict';
 
-  var idel = Network({ name: 'Idel' });
-  
-  this.networks.push(idel);
+app.service('IRCService', function (Network, LineSocket) {
+  this.networks = [Network({ name: 'Idel' })];
   
   this.networkByName = function (name) {
     return _.find(this.networks, { name: name });
@@ -264,18 +262,18 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
   
   this.register('ctcp', function (nick, message) {
     var args = _.toArray(arguments);
-    this.network.writeLine("PRIVMSG %s :\001%s\001", args.shift(), args.join(' '));
+    this.network.writeLine('PRIVMSG %s :\u0001%s\u0001', args.shift(), args.join(' '));
   }, 'Send a CTCP message to nick.');
   
   this.register('me', function (message) {
-    this.network.writeLine("PRIVMSG %s :\001ACTION %s\001", this.channel.name, _.toArray(arguments).join(' '));
+    this.network.writeLine('PRIVMSG %s :\u0001ACTION %s\u0001', this.channel.name, _.toArray(arguments).join(' '));
   }, 'Send an action to the current channel.');
 });
 
 app.service('ColorService', function () {
   var colors = '_white black blue green _red red purple yellow _yellow _green cyan _cyan _blue _purple _black'.split(' ');
   for (var i = 0; i < colors.length; i++) {
-    this[colors[i]] = "\003" + _.str.sprintf('%02f', i);
+    this[colors[i]] = _.str.sprintf('\u0003%02f', i);
   }
-  this.white = this.reset = "\x0f";
+  this.white = this.reset = '\x0f';
 });

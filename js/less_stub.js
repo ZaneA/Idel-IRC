@@ -1,1 +1,3 @@
-less = { async: true, fileAsync: true };
+'use strict';
+
+var less = { async: true, fileAsync: true };

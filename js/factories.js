@@ -1,3 +1,5 @@
+'use strict';
+
 app.factory('LineSocket', function () {
   function lineSocket () {
     this._lineBuffer = '';
@@ -34,7 +36,7 @@ app.factory('LineSocket', function () {
         return;
 
       self._lineBuffer += self.arrayBufferToString(result.data);
-      var parts = self._lineBuffer.split("\r\n");
+      var parts = self._lineBuffer.split('\r\n');
 
       for (var i = 0; i < parts.length - 1; i++) {
         self._onMessage(parts[i]);
@@ -47,7 +49,7 @@ app.factory('LineSocket', function () {
   };
   
   lineSocket.prototype.writeLine = function (line) {
-    line += "\r\n";
+    line += '\r\n';
     chrome.socket.write(this._socket, this.stringToArrayBuffer(line), function (result) {});
   };
   
@@ -279,8 +281,8 @@ app.factory('Network', function ($rootScope, PortService, ColorService, LineSock
         privateMsg = true;
       }
 
-      if (message[0] == "\001") { // Handle CTCP
-        var match = message.match(/\001(.*?)(\s.*)?\001/);
+      if (message[0] == '\u0001') { // Handle CTCP
+        var match = message.match(/\u0001(.*?)(\s.*)?\u0001/);
 
         if (match) {
           var body = _.str.ltrim(match[2]);
@@ -293,19 +295,19 @@ app.factory('Network', function ($rootScope, PortService, ColorService, LineSock
 
           case 'VERSION':
             if (type == 'PRIVMSG') {
-              this.writeLine('NOTICE %s :\001VERSION Idel IRC %s\001', nick, chrome.runtime.getManifest().version);
+              this.writeLine('NOTICE %s :\u0001VERSION Idel IRC %s\u0001', nick, chrome.runtime.getManifest().version);
             }
             return;
 
           case 'TIME':
             if (type == 'PRIVMSG') {
-              this.writeLine('NOTICE %s :\001TIME :%s\001', nick, moment().format('dddd, MMMM Do YYYY, h:mm:ss a'));
+              this.writeLine('NOTICE %s :\u0001TIME :%s\u0001', nick, moment().format('dddd, MMMM Do YYYY, h:mm:ss a'));
             }
             return;
 
           case 'PING':
             if (type == 'PRIVMSG') {
-              this.writeLine('NOTICE %s :\001PING %s\001', nick, body);
+              this.writeLine('NOTICE %s :\u0001PING %s\u0001', nick, body);
             }
             return;
           }
@@ -407,7 +409,7 @@ app.factory('Channel', function () {
         var nick = args.shift();
         var message = _.str.sprintf.apply(this, args);
 
-        var lines = message.split("\n");
+        var lines = message.split('\n');
 
         for (var i = 0; i < lines.length; i++) {
           this.buffer.push({

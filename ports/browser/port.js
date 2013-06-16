@@ -1,3 +1,5 @@
+'use strict';
+
 app.service('PortService', function () {
   this.canMinimize = false;
   this.minimizeWindow = function () {};

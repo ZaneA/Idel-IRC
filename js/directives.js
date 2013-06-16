@@ -1,3 +1,5 @@
+'use strict';
+
 app.directive('networkList', function () {
   return {
     templateUrl: 'js/templates/networkList.html',
@@ -107,7 +109,7 @@ app.directive('inputBox', function (InputService) {
 
           return;
         }
-
+        
         if (ev.keyCode == 9 && $scope.input.length > 0) { // Tab
           $scope.$apply(function () {
             $scope.input = InputService.autocomplete($scope.input);
