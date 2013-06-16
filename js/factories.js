@@ -133,10 +133,6 @@ app.factory('Network', function ($rootScope, PortService, ColorService, LineSock
 
     // TODO Reconnect logic
   };
-
-  return function (obj) {
-    return _.assign(new network(), obj);
-  };
   
   // HELPERS
 
@@ -406,6 +402,10 @@ app.factory('Network', function ($rootScope, PortService, ColorService, LineSock
 
       case 'ERROR':
      */
+
+  return function (obj) {
+    return _.assign(new network(), obj);
+  };
 });
 
 /**
