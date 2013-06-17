@@ -61,3 +61,12 @@ app.filter('channelOrder', function () {
     });
   };
 });
+
+app.filter('default', function () {
+  return function (value, defaultValue) {
+    if (value === undefined || value === null || value === '')
+      return defaultValue;
+
+    return value;
+  };
+});
