@@ -358,10 +358,13 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
    *     InputService.autocomplete('/con'); => '/connect '
    */
   this.autocomplete = function (line) {
+    var parts = line.split(' ');
+    var word = parts.pop();
+
     // Autocomplete help commands
     for (var i = 0; i < this._handlers.length; i++) {
       var desc = commandHelp(this._handlers[i]);
-      if (_.str.startsWith(desc, line)) {
+      if (_.str.startsWith(desc.toLowerCase(), line.toLowerCase())) {
         return desc + ' ';
       }
     }
@@ -370,8 +373,9 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
     var channel = IRCService.currentChannel();
 
     for (var i = 0; i < channel.nicks.length; i++) {
-      if (_.str.startsWith(channel.nicks[i].name, line)) {
-        return channel.nicks[i].name + ', ';
+      if (_.str.startsWith(channel.nicks[i].name.toLowerCase(), word.toLowerCase())) {
+        var beginning = parts.length == 0;
+        return parts.join(' ') + (beginning ? '' : ' ') + channel.nicks[i].name + (beginning ? ', ' : ' ');
       }
     }
     
