@@ -550,6 +550,15 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
   this.register('load', function (_remote) {
     SettingsService.load(_remote);
   }, 'Load settings from local or remote storage.');
+  
+  this.register('wc', function () {
+    if (this.channel.name == 'Status') {
+      this.network.disconnect();
+      IRCService.networks = _.reject(IRCService.networks, { name: this.network.name });
+    } else {
+      this.network.channels = _.reject(this.network.channels, { name: this.channel.name });
+    }
+  }, 'Close current window.');
 });
 
 /**
