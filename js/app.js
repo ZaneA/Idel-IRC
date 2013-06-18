@@ -15,7 +15,9 @@ app.controller('IdelController', function ($scope, $http, PortService, SettingsS
     $scope.irc.setCurrentChannel(args.network, args.channel);
   });
   
-  $scope.$watch('settings.get("theme.user-css")', function (val) {
+  var loadStyle = function () {
+    var val = $scope.settings.get('theme.user-css');
+
     var css = document.getElementById('user-css');
     if (css) {
       document.body.removeChild(css);
@@ -24,7 +26,7 @@ app.controller('IdelController', function ($scope, $http, PortService, SettingsS
     if (!val)
       return;
     
-    $http.get(val, { responseType: 'blob' }).success(function (response) {
+    $http.get(val + '?' + moment().unix(), { responseType: 'blob' }).success(function (response) {
       css = document.createElement('link');
       css.rel = 'stylesheet';
       css.type = 'text/css';
@@ -32,7 +34,10 @@ app.controller('IdelController', function ($scope, $http, PortService, SettingsS
       
       document.body.appendChild(css);
     });
-  });
+  };
+
+  $scope.$watch('settings.get("theme.user-css")', loadStyle);
+  $scope.$on('ui::refresh-style', loadStyle);
 
   $scope.irc.getStatusChannel().topic = _.str.sprintf('Welcome to %sidel IRC%s, type %s/help%s to begin.',
                                                       ColorService._white, ColorService.reset,

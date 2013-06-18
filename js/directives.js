@@ -92,6 +92,11 @@ app.directive('inputBox', function (InputService) {
       };
 
       $element.children()[0].onkeydown = function (ev) {
+        if (ev.keyIdentifier == 'F5') { // Refresh User CSS
+          $rootScope.$broadcast('ui::refresh-style');
+          $rootScope.$apply();
+        }
+
         if (ev.ctrlKey && ev.keyCode == 9) {
           if (ev.shiftKey) {
             InputService.jumpChannel(-1, true); // Relative
