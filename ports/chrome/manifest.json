@@ -11,7 +11,8 @@
   "permissions": [
     { "socket": [ "tcp-connect" ] },
     "storage",
-    "notifications"
+    "notifications",
+    "<all_urls>"
   ],
   "icons": {
     "16": "assets/icon-16.png",

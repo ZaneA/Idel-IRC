@@ -205,7 +205,8 @@ app.service('SettingsService', function ($rootScope, PortService) {
   this._defaults = {
     'theme.layout': 'layouts/horizontal.html',
     'theme.user-css': null,
-    'irc.nick': 'Idel'
+    'irc.nick': 'Idel',
+    'idel.firstrun': true
   };
   
   this._settings = {};
