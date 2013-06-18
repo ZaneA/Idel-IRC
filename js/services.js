@@ -458,6 +458,8 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
     });
 
     IRCService.networks.push(network);
+    
+    $rootScope.$broadcast('ui::switch-channel', { network: network.name, channel: 'Status' });
 
     network.connect();
   }, 'Connect to a server.');

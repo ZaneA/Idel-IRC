@@ -11,7 +11,7 @@ app.controller('IdelController', function ($scope, $http, PortService, SettingsS
     InputService.parse(input.message);
   });
   
-  $scope.$on('ui::channel-list::select', function (ev, args) {
+  $scope.$on('ui::switch-channel', function (ev, args) {
     $scope.irc.setCurrentChannel(args.network, args.channel);
   });
   

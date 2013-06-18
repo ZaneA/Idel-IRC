@@ -243,6 +243,7 @@ app.factory('Network', function ($rootScope, PortService, ColorService, LineSock
         channel = Channel(channelName);
         channel.addLine(1, null, '%sJoined %s', ColorService.green, channelName);
         this.channels.push(channel);
+        $rootScope.$broadcast('ui::switch-channel', { network: this.name, channel: channelName });
       } else {
         // Add nick to the channel
         channel = this.findChannel(channelName);
