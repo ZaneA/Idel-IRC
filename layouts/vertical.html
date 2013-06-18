@@ -1,16 +1,16 @@
 <vbox>
-  <header class="flex-0">
+  <header>
     <h1>Idel</h1>
     <p data-ng-bind-html-unsafe="irc.currentChannel().topic | default:'No Topic' | escape | irccolorize | linkify"></p>
     <button class="button-minimize" data-ng-show="port.canMinimize" data-ng-click="port.minimizeWindow()">_</button>
     <button class="button-close" data-ng-show="port.canClose" data-ng-click="port.closeWindow()">&times;</button>
   </header>
 
-  <network-list for="irc.networks" class="flex-0 horizontal"></network-list>
+  <network-list for="irc.networks" class="horizontal"></network-list>
 
   <chat-window for="irc.currentChannel()" class="flex-1"></chat-window>
 
-  <nick-list for="irc.currentChannel()" class="flex-0 horizontal"></nick-list>
+  <nick-list for="irc.currentChannel()" class="horizontal"></nick-list>
 
-  <input-box for="irc.current" class="flex-0"></input-box>
+  <input-box for="irc.current"></input-box>
 </vbox>
