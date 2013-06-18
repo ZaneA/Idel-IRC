@@ -494,7 +494,7 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
   
   this.register('search', function (term) {
     _.each(_.filter(this.channel.buffer, function (line) {
-      return _.str.include(line.message, term);
+      return _.str.include(line.message.toLowerCase(), term.toLowerCase());
     }), function (message) {
       this.channel.addLine(1, null, '%s%s: %s', ColorService._red, (message.nick ? message.nick : 'status'), message.message);
     }, this);
