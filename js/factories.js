@@ -7,11 +7,10 @@
  * @class Network
  * @constructor
 */
-app.factory('Network', function ($rootScope, PortService, ColorService, LineSocket, /*TLSLineSocket,*/ Channel, Nick) {
+app.factory('Network', function ($rootScope, $q, PortService, ColorService, LineSocket, /*TLSLineSocket,*/ Channel, Nick) {
   function network () {
     this.channels = [Channel('Status')];
   }
-  
 
   /**
    * A list of registered protocol handlers.
@@ -20,6 +19,32 @@ app.factory('Network', function ($rootScope, PortService, ColorService, LineSock
    * @type {Array}
    */
   network.prototype._handlers = [];
+
+  /**
+   * A list of promises to fulfill.
+   *
+   * @property _promises
+   * @type {Array}
+   */
+  network.prototype._promises = [];
+
+  /**
+   * Register a new promise.
+   *
+   * @method waitFor
+   * @param {String} description Wait for this description.
+   * @param {Function} [filter] Optional filter for this promise.
+   * @return {Promise} A promise.
+   * @example
+   *     network.waitFor('RFC1459::PING').then(function () {
+   *       console.log('Got ping');
+   *     });
+   */
+  network.prototype.waitFor = function (desc, filter) {
+    var deferred = $q.defer();
+    network.prototype._promises.push({ desc: desc, filter: filter, promise: deferred });
+    return deferred.promise;
+  };
 
   /**
    * Register a new handler for a piece of the IRC protocol.
@@ -113,6 +138,15 @@ app.factory('Network', function ($rootScope, PortService, ColorService, LineSock
       if (match) {
         match.shift();
         network.prototype._handlers[i].handler.apply(this, match);
+        
+        var promises = _.filter(network.prototype._promises, { desc: network.prototype._handlers[i].desc });
+        _.each(promises, function (val) {
+          if (val.filter && !val.filter(line))
+            return;
+
+          val.promise.resolve();
+        });
+
         break;
       }
     }
@@ -343,18 +377,31 @@ app.factory('Network', function ($rootScope, PortService, ColorService, LineSock
         channel.nicks.push(Nick(nick));
       }
 
-      nick = _.find(channel.nicks, { name: nick });
+      var handle = function () {
+        nick = _.find(channel.nicks, { name: nick });
 
-      channel.addLine(lineType, nick, '%s', message);
+        channel.addLine(lineType, nick, '%s', message);
 
-      if (channel.notifyType < 2)
-        channel.notifyType = 2;
+        if (channel.notifyType < 2)
+          channel.notifyType = 2;
 
-      // Highlight notifications
-      if (_.str.include(message.toLowerCase(), this.nick.name.toLowerCase())) {
-        PortService.notify('(' + channel.name + ') ' + nick.name, message);
-        if (channel.notifyType < 3)
-          channel.notifyType = 3;
+        // Highlight notifications
+        if (_.str.include(message.toLowerCase(), this.nick.name.toLowerCase())) {
+          PortService.notify('(' + channel.name + ') ' + nick.name, message);
+          if (channel.notifyType < 3)
+            channel.notifyType = 3;
+        }
+      }.bind(this);
+      
+      if (channel.nicks.length > 0) {
+        handle();
+      } else {
+        // Wait for topic and nick list
+        this.writeLine('TOPIC ' + channel.name);
+        this.waitFor('RFC1459::332::RPL_TOPIC').then(function () {
+          this.writeLine('NAMES ' + channel.name);
+          this.waitFor('RFC1459::353::RPL_NAMREPLY').then(handle);
+        }.bind(this));
       }
   });
   
