@@ -145,6 +145,7 @@ app.factory('Network', function ($rootScope, $q, PortService, ColorService, Line
             return;
 
           val.promise.resolve();
+          network.prototype._promises = _.reject(network.prototype._promises, { desc: val.desc });
         });
 
         break;
@@ -373,7 +374,7 @@ app.factory('Network', function ($rootScope, $q, PortService, ColorService, Line
 
       var channel = this.findOrCreateChannel(channelName);
       
-      if (privateMsg) {
+      if (privateMsg && channel.nicks.length == 0) {
         channel.nicks.push(Nick(nick));
       }
 
@@ -398,8 +399,8 @@ app.factory('Network', function ($rootScope, $q, PortService, ColorService, Line
       } else {
         // Wait for topic and nick list
         this.writeLine('TOPIC ' + channel.name);
+        this.writeLine('NAMES ' + channel.name);
         this.waitFor('RFC1459::332::RPL_TOPIC').then(function () {
-          this.writeLine('NAMES ' + channel.name);
           this.waitFor('RFC1459::353::RPL_NAMREPLY').then(handle);
         }.bind(this));
       }
