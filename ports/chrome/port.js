@@ -17,7 +17,7 @@ app.service('PortService', function () {
   
   this.loadSettings = function (key, def, callback) {
     chrome.storage.sync.get(key, function (items) {
-      callback(_.assign(items, def));
+      callback(_.defaults(items, def));
     });
   };
   

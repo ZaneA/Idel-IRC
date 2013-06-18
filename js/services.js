@@ -183,7 +183,7 @@ app.service('NickColor', function () {
  * @class SettingsService
  * @constructor
 */
-app.service('SettingsService', function () {
+app.service('SettingsService', function ($rootScope, PortService) {
   /**
    * The path to the active layout.
    *
@@ -201,6 +201,58 @@ app.service('SettingsService', function () {
    * @default "themes/dark.json"
    */
   this.theme = 'themes/dark.json';
+  
+  this._defaults = {
+    'theme.layout': 'layouts/horizontal.html',
+    'theme.user-css': null,
+    'irc.nick': 'Idel'
+  };
+  
+  this._settings = {};
+  
+  this.get = function (key, def) {
+    return this._settings[key] || def;
+  };
+
+  this.set = function (key, val) {
+    if (val == 'true') val = true;
+    if (val == 'false') val = false;
+    if (val == 'null') {
+      delete this._settings[key];
+      return;
+    }
+    
+    this._settings[key] = val;
+  };
+  
+  this.save = function (remote) {
+    PortService.saveSettings({ 'settings': this._settings }, function () {
+      console.log('Saved settings.');
+    });
+  };
+
+  this.load = function (remote) {
+    var self = this;
+
+    PortService.loadSettings('settings', {}, function (settings) {
+      self._settings = _.defaults(settings.settings || {}, self._defaults);
+      console.log('Loaded settings:', self._settings);
+      
+      $rootScope.$apply();
+    });
+  };
+  
+  this.find = function (term) {
+    var settings = _.filter(this._settings, function (val, key) {
+      return _.str.include(key, term);
+    });
+
+    console.log('Found settings:', settings);
+
+    return settings;
+  };
+  
+  this.load();
 });
 
 /**
@@ -472,6 +524,29 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
     this.channel.addLine(1, null, '%sGitHub%s - https://github.com/ZaneA/Idel-IRC/issues', ColorService.green, ColorService.reset);
     this.channel.addLine(1, null, '%sEmail%s - %szane.a+idel@demonastery.org', ColorService.green, ColorService.reset, ColorService._white);
   }, 'Get instructions on bug reporting.');
+  
+  this.register('set', function (_key, _value) {
+    var display = function (val, key) {
+      this.channel.addLine(1, null, '%s%s%s: "%s"', ColorService.yellow, key, ColorService.reset, val);
+    }.bind(this);
+
+    if (!_key && !_value) { // Display all
+      _.each(SettingsService._settings, display);
+    } else if (!_value) { // Partial search
+      _.each(SettingsService.find(_key), display);
+    } else { // Setting
+      SettingsService.set(_key, _value);
+      this.channel.addLine(1, null, '%s%s%s set to "%s"', ColorService.yellow, _key, ColorService.reset, _value);
+    }
+  }, 'Modify or display various settings.');
+
+  this.register('save', function (_remote) {
+    SettingsService.save(_remote);
+  }, 'Save settings to local or remote storage.');
+
+  this.register('load', function (_remote) {
+    SettingsService.load(_remote);
+  }, 'Load settings from local or remote storage.');
 });
 
 /**
