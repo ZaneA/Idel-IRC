@@ -491,3 +491,20 @@ app.service('ColorService', function () {
   }
   this.white = this.reset = '\x0f';
 });
+
+/**
+ * Modal Service. This service allows displaying a template to the user
+ * inside of a Modal dialog.
+ *
+ * @class ModalService
+ * @constructor
+ * @example
+ *     ModalService.display('thanks');
+ */
+app.service('ModalService', function () {
+  this.template = '';
+
+  this.display = function (template) {
+    this.template = _.str.sprintf('js/templates/%s.html', template);
+  };
+});

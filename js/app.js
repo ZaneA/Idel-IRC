@@ -2,7 +2,7 @@
 
 var app = angular.module('IdelApp', []);
 
-app.controller('IdelController', function ($scope, $http, PortService, SettingsService, IRCService, InputService, ColorService) {
+app.controller('IdelController', function ($scope, $http, PortService, SettingsService, IRCService, InputService, ColorService, ModalService) {
   $scope.settings = SettingsService;
   $scope.irc = IRCService;
   $scope.port = PortService;
@@ -24,4 +24,9 @@ app.controller('IdelController', function ($scope, $http, PortService, SettingsS
   $scope.irc.getStatusChannel().topic = _.str.sprintf('Welcome to %sidel IRC%s, type %s/help%s to begin.',
                                                       ColorService._white, ColorService.reset,
                                                       ColorService.green, ColorService.reset);
+  
+  setTimeout(function () {
+    ModalService.display('thanks');
+    $scope.$apply();
+  }, 500);
 });

@@ -165,3 +165,18 @@ app.directive('colorize', function (NickColor) {
     }
   };
 });
+
+app.directive('modalDialog', function () {
+  return {
+    restrict: 'E',
+    replace: 'true',
+    template: '<div class="modal" data-ng-show="modal.template != \'\'" data-ng-animate="{show: \'slide-show\', hide: \'slide-hide\' }" data-ng-include="modal.template"></div>',
+    controller: function ($scope, ModalService) {
+      $scope.modal = ModalService;
+
+      $scope.close = function () {
+        $scope.modal.template = '';
+      };
+    }
+  };
+});
