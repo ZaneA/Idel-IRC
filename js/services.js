@@ -314,6 +314,7 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
       for (var i = 0; i < this._handlers.length; i++) {
         if (parts[0] == '/' + this._handlers[i].command) {
           parts.shift();
+          bindObject.channel.addLine(0, Nick(SettingsService.get('irc.nick')), '%s', line);
           this._handlers[i].handler.apply(bindObject, parts);
           return;
         }
