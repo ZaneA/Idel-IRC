@@ -41,9 +41,17 @@ app.factory('Network', function ($rootScope, $q, PortService, ColorService, Line
    *     });
    */
   network.prototype.waitFor = function (desc, filter) {
-    var deferred = $q.defer();
-    network.prototype._promises.push({ desc: desc, filter: filter, promise: deferred });
-    return deferred.promise;
+    var makePromise = function (desc) {
+      var deferred = $q.defer();
+      network.prototype._promises.push({ desc: desc, filter: filter, promise: deferred });
+      return deferred.promise;
+    };
+
+    if (typeof desc == 'string') {
+      return makePromise(desc);
+    } else {
+      return $q.all(_.map(desc, makePromise));
+    }
   };
 
   /**
@@ -378,6 +386,7 @@ app.factory('Network', function ($rootScope, $q, PortService, ColorService, Line
         channel.nicks.push(Nick(nick));
       }
 
+      var self = this;
       var handle = function () {
         nick = _.find(channel.nicks, { name: nick });
 
@@ -387,12 +396,12 @@ app.factory('Network', function ($rootScope, $q, PortService, ColorService, Line
           channel.notifyType = 2;
 
         // Highlight notifications
-        if (_.str.include(message.toLowerCase(), this.nick.name.toLowerCase())) {
+        if (_.str.include(message.toLowerCase(), self.nick.name.toLowerCase())) {
           PortService.notify('(' + channel.name + ') ' + nick.name, message);
           if (channel.notifyType < 3)
             channel.notifyType = 3;
         }
-      }.bind(this);
+      };
       
       if (channel.nicks.length > 0) {
         handle();
@@ -400,9 +409,7 @@ app.factory('Network', function ($rootScope, $q, PortService, ColorService, Line
         // Wait for topic and nick list
         this.writeLine('TOPIC ' + channel.name);
         this.writeLine('NAMES ' + channel.name);
-        this.waitFor('RFC1459::332::RPL_TOPIC').then(function () {
-          this.waitFor('RFC1459::353::RPL_NAMREPLY').then(handle);
-        }.bind(this));
+        this.waitFor(['RFC1459::332::RPL_TOPIC', 'RFC1459::353::RPL_NAMREPLY']).then(handle);
       }
   });
   
