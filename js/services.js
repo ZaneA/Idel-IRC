@@ -306,7 +306,7 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
     var bindObject = {
       network: IRCService.currentNetwork(),
       channel: IRCService.currentChannel(),
-      statusChannel: IRCService.getStatusChannel()
+      statusChannel: IRCService.getStatusChannel(IRCService.current.network)
     };
     
     if (_.str.startsWith(line, '/')) {
@@ -314,7 +314,7 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
       for (var i = 0; i < this._handlers.length; i++) {
         if (parts[0] == '/' + this._handlers[i].command) {
           parts.shift();
-          bindObject.channel.addLine(0, Nick(SettingsService.get('irc.nick')), '%s', line);
+          bindObject.statusChannel.addLine(0, Nick(SettingsService.get('irc.nick')), '%s', line);
           this._handlers[i].handler.apply(bindObject, parts);
           return;
         }
@@ -443,9 +443,8 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
   this.register('help', function () {
     for (var i = 0; i < self._handlers.length; i++) {
       var description = commandHelp(self._handlers[i]);
-      var channel = IRCService.getStatusChannel(IRCService.current.network);
-      channel.addLine(1, null, '%s%s', ColorService._white, description);
-      channel.addLine(1, null, '%s    %s', ColorService.black, self._handlers[i].desc);
+      this.statusChannel.addLine(1, null, '%s%s', ColorService._white, description);
+      this.statusChannel.addLine(1, null, '%s    %s', ColorService.black, self._handlers[i].desc);
     }
   }, 'Display a list of commands.');
 
@@ -524,14 +523,14 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
   }, 'Send an action to the current channel.');
   
   this.register('bug', function () {
-    this.channel.addLine(1, null, '%sYou can report bugs either via:', ColorService.yellow);
-    this.channel.addLine(1, null, '%sGitHub%s - https://github.com/ZaneA/Idel-IRC/issues', ColorService.green, ColorService.reset);
-    this.channel.addLine(1, null, '%sEmail%s - %szane.a+idel@demonastery.org', ColorService.green, ColorService.reset, ColorService._white);
+    this.statusChannel.addLine(1, null, '%sYou can report bugs either via:', ColorService.yellow);
+    this.statusChannel.addLine(1, null, '%sGitHub%s - https://github.com/ZaneA/Idel-IRC/issues', ColorService.green, ColorService.reset);
+    this.statusChannel.addLine(1, null, '%sEmail%s - %szane.a+idel@demonastery.org', ColorService.green, ColorService.reset, ColorService._white);
   }, 'Get instructions on bug reporting.');
   
   this.register('set', function (_key, _value) {
     var display = function (val, key) {
-      this.channel.addLine(1, null, '%s%s%s: "%s"', ColorService.yellow, key, ColorService.reset, val);
+      this.statusChannel.addLine(1, null, '%s%s%s: "%s"', ColorService.yellow, key, ColorService.reset, val);
     }.bind(this);
 
     if (!_key && !_value) { // Display all
@@ -540,7 +539,7 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
       _.each(SettingsService.find(_key), display);
     } else { // Setting
       SettingsService.set(_key, _value);
-      this.channel.addLine(1, null, '%s%s%s set to "%s"', ColorService.yellow, _key, ColorService.reset, _value);
+      this.statusChannel.addLine(1, null, '%s%s%s set to "%s"', ColorService.yellow, _key, ColorService.reset, _value);
     }
   }, 'Modify or display various settings.');
 
