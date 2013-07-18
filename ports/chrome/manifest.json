@@ -1,7 +1,7 @@
 {
   "name": "Idel IRC",
   "description": "A friendly yet advanced client for IRC (Internet Relay Chat).",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "manifest_version": 2,
   "app": {
     "background": {

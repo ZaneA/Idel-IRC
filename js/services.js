@@ -448,9 +448,9 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
     }
   }, 'Display a list of commands.');
 
-  this.register('connect', function (server, _name, _nick, _pass) {
+  this.register('connect', function (server, _displayname, _nick, _pass) {
     var network = Network({
-      name: _name || server,
+      name: _displayname || server,
       servers: [server],
       nick: Nick(_nick || 'Idel'),
       password: _pass,
@@ -462,7 +462,7 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
     $rootScope.$broadcast('ui::switch-channel', { network: network.name, channel: 'Status' });
 
     network.connect();
-  }, 'Connect to a server.');
+  }, 'Connect to a server. <server> must be specified with a port (ie. chat.freenode.net:6667)');
   
   this.register('disconnect', function () {
     this.network.disconnect();
