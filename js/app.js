@@ -1,6 +1,7 @@
 'use strict';
 
 // Useful wrapper
+// FIXME this should live elsewhere, perhaps in a underscore.string.stub file
 String.prototype.format = function () {
   var args = Array.prototype.slice.call(arguments);
   args.unshift(this.toString());
@@ -46,9 +47,9 @@ app.controller('IdelController', function ($scope, $http, PortService, SettingsS
   $scope.$watch('settings.get("theme.user-css")', loadStyle);
   $scope.$on('ui::refresh-style', loadStyle);
 
-  $scope.irc.getStatusChannel().topic = _.str.sprintf('Welcome to %sidel IRC%s, type %s/help%s to begin.',
-                                                      ColorService._white, ColorService.reset,
-                                                      ColorService.green, ColorService.reset);
+  $scope.irc.getStatusChannel().topic = 'Welcome to %sidel IRC%s, type %s/help%s to begin.'.format(
+    ColorService._white, ColorService.reset,
+    ColorService.green, ColorService.reset);
   
   $scope.$watch('settings.get("idel.firstrun")', function (firstrun) {
     if (firstrun) {

@@ -325,9 +325,9 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
       var arg = _.str.trim(args.shift());
       if (arg[0] == '_') {
         arg = _.str.ltrim(arg, '_');
-        desc += _.str.sprintf(' %s[%s]', ColorService.yellow, arg);
+        desc += ' %s[%s]'.format(ColorService.yellow, arg);
       } else {
-        desc += _.str.sprintf(' %s<%s>', ColorService.yellow, arg);
+        desc += ' %s<%s>'.format(ColorService.yellow, arg);
       }
     }
 
@@ -556,7 +556,7 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
 app.service('ColorService', function () {
   var colors = '_white black blue green _red red purple yellow _yellow _green cyan _cyan _blue _purple _black'.split(' ');
   for (var i = 0; i < colors.length; i++) {
-    this[colors[i]] = _.str.sprintf('\u0003%02f', i);
+    this[colors[i]] = '\u0003%02f'.format(i);
   }
   this.white = this.reset = '\x0f';
 });
@@ -574,6 +574,6 @@ app.service('ModalService', function () {
   this.template = '';
 
   this.display = function (template) {
-    this.template = _.str.sprintf('js/templates/%s.html', template);
+    this.template = 'js/templates/%s.html'.format(template);
   };
 });
