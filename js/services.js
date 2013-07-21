@@ -184,24 +184,6 @@ app.service('NickColor', function () {
  * @constructor
 */
 app.service('SettingsService', function ($rootScope, PortService) {
-  /**
-   * The path to the active layout.
-   *
-   * @property layout
-   * @type {String}
-   * @default "layouts/horizontal.html"
-   */
-  this.layout = 'layouts/horizontal.html';
-
-  /**
-   * The path to the active theme.
-   *
-   * @property theme
-   * @type {String}
-   * @default "themes/dark.json"
-   */
-  this.theme = 'themes/dark.json';
-  
   this._defaults = {
     'theme.layout': 'layouts/horizontal.html',
     'theme.user-css': null,
@@ -481,12 +463,12 @@ app.service('InputService', function ($rootScope, IRCService, SettingsService, C
   }, 'Send a raw string to the server.');
 
   this.register('layout', function (layout) {
-    SettingsService.layout = 'layouts/' + layout + '.html';
+    SettingsService.set('theme.layout', 'layouts/%s.html'.format(layout));
   }, 'Change the current layout.');
 
   this.register('theme', function (theme) {
-    SettingsService.theme = 'themes/' + theme + '.json';
-  }, 'Change the current theme.');
+    SettingsService.set('theme.user-css', theme);
+  }, 'Change the current theme URL (user CSS).');
   
   this.register('clear', function () {
     this.channel.buffer = [];

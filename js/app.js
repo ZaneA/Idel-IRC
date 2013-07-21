@@ -1,5 +1,12 @@
 'use strict';
 
+// Useful wrapper
+String.prototype.format = function () {
+  var args = Array.prototype.slice.call(arguments);
+  args.unshift(this.toString());
+  return _.str.sprintf.apply(this, args);
+};
+
 var app = angular.module('IdelApp', []);
 
 app.controller('IdelController', function ($scope, $http, PortService, SettingsService, IRCService, InputService, ColorService, ModalService) {
